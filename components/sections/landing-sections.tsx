@@ -129,14 +129,12 @@ function HeroVerse() {
         dir="rtl"
         lang="ar"
         aria-label="Ayat al-Kursi Arabic"
-        data-hero-no-highlight
         className="absolute inset-x-6 top-0 z-[1] flex h-[25%] flex-row flex-wrap content-start justify-start gap-x-3 gap-y-2 overflow-hidden pt-4 text-right text-xl leading-[2] text-background sm:pt-6 sm:text-2xl lg:text-3xl"
       >
         {heroVerseArabicSegments.map((segment) => (
           <span
             key={segment}
             tabIndex={0}
-            data-hero-no-highlight
             className="hero-verse-segment pointer-events-auto rounded-sm outline-none"
           >
             {segment}
@@ -146,14 +144,12 @@ function HeroVerse() {
       <figcaption
         lang="en"
         aria-label="Ayat al-Kursi English translation"
-        data-hero-no-highlight
         className="font-scripture absolute inset-x-6 bottom-0 z-[1] flex h-[25%] flex-wrap content-end justify-start gap-x-2 gap-y-2 overflow-hidden pb-4 text-left text-xs leading-7 text-background/82 sm:pb-6 sm:text-sm lg:text-base"
       >
         {heroVerseTranslationSegments.map((segment) => (
           <span
             key={segment}
             tabIndex={0}
-            data-hero-no-highlight
             className="hero-verse-segment pointer-events-auto rounded-sm outline-none"
           >
             {segment}
@@ -191,7 +187,6 @@ function HeroSection({ copy }: LandingPageProps) {
             {copy.hero.supportingLine}
           </p>
           <div
-            data-hero-no-highlight
             className="pointer-events-auto mx-auto mt-8 flex w-fit flex-col justify-center gap-3 sm:flex-row"
           >
             <Button
