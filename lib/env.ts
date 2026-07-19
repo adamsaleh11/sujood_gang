@@ -13,6 +13,11 @@ export const env = createEnv({
     RESEND_API_KEY: z.string().min(1),
     EMAIL_FROM: z.string().min(1),
     EMAIL_TOKEN_SECRET: z.string().min(32),
+    VERIFICATION_TOKEN_TTL_HOURS: z.coerce
+      .number()
+      .int()
+      .positive()
+      .default(48),
     SENTRY_DSN: z.url().optional(),
     SENTRY_AUTH_TOKEN: z.string().min(1).optional(),
   },
@@ -30,6 +35,7 @@ export const env = createEnv({
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     EMAIL_FROM: process.env.EMAIL_FROM,
     EMAIL_TOKEN_SECRET: process.env.EMAIL_TOKEN_SECRET,
+    VERIFICATION_TOKEN_TTL_HOURS: process.env.VERIFICATION_TOKEN_TTL_HOURS,
     SENTRY_DSN: process.env.SENTRY_DSN,
     SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,

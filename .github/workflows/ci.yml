@@ -40,5 +40,45 @@ jobs:
       - name: Test
         run: pnpm test
 
+      - name: Count draft copy markers
+        run: pnpm check:drafts
+
       - name: Build
         run: pnpm build
+
+  db:
+    name: Database schema & RLS
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start local Supabase
+        run: supabase start
+
+      - name: Apply migrations to a fresh database
+        run: supabase db reset
+
+      - name: Export local Supabase credentials
+        run: |
+          {
+            echo "SUPABASE_TEST_URL=$(supabase status -o env | grep '^API_URL=' | cut -d= -f2- | tr -d '\"')"
+            echo "SUPABASE_TEST_ANON_KEY=$(supabase status -o env | grep '^ANON_KEY=' | cut -d= -f2- | tr -d '\"')"
+            echo "SUPABASE_TEST_SERVICE_ROLE_KEY=$(supabase status -o env | grep '^SERVICE_ROLE_KEY=' | cut -d= -f2- | tr -d '\"')"
+          } >> "$GITHUB_ENV"
+
+      - name: Run DB integration tests
+        run: pnpm test:db

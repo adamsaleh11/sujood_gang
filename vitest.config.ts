@@ -7,6 +7,9 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     include: ["**/*.test.{ts,tsx}"],
+    // Integration tests need a live Postgres (local Supabase) and run in a
+    // separate job via vitest.integration.config.ts / `pnpm test:db`.
+    exclude: ["**/node_modules/**", "**/*.integration.test.ts"],
     setupFiles: ["./vitest.setup.ts"],
   },
   resolve: {
