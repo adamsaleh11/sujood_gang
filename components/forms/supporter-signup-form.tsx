@@ -7,6 +7,7 @@ import {
   captureAttributionOnLanding,
   readAttributionPayload,
 } from "@/lib/attribution/client";
+import { trackFunnelEvent } from "@/lib/analytics/client";
 import type { SignupFormCopy } from "@/lib/content/copy";
 import type { CreateSupporterResult } from "@/lib/supporters/signup-service";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ export function SupporterSignupForm({
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
+  const hasStartedRef = useRef(false);
 
   useEffect(() => {
     captureAttributionOnLanding();
@@ -33,6 +35,7 @@ export function SupporterSignupForm({
 
   function handleSubmit(formData: FormData) {
     setSubmitState("idle");
+    trackFunnelEvent("form_submitted", { form: "supporter_signup" });
     const attribution = readAttributionPayload();
     if (attribution) {
       formData.set("attribution", JSON.stringify(attribution));
@@ -42,13 +45,27 @@ export function SupporterSignupForm({
       try {
         const result = await createSupporter(formData);
         setSubmitState(result.state);
+        trackFunnelEvent("signup_completed", {
+          form: "supporter_signup",
+          state: result.state,
+        });
         if (result.state === "created") {
           formRef.current?.reset();
         }
       } catch {
         setSubmitState("unexpected_error");
+        trackFunnelEvent("signup_completed", {
+          form: "supporter_signup",
+          state: "unexpected_error",
+        });
       }
     });
+  }
+
+  function handleFormFocus() {
+    if (hasStartedRef.current) return;
+    hasStartedRef.current = true;
+    trackFunnelEvent("form_started", { form: "supporter_signup" });
   }
 
   const message = statusMessage(copy, submitState);
@@ -59,83 +76,126 @@ export function SupporterSignupForm({
     submitState === "accepted";
 
   return (
-    <form ref={formRef} action={handleSubmit} className="space-y-5">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <FormField
-          label={copy.labels.name}
-          name="name"
-          autoComplete="name"
-          placeholder={copy.placeholders.name}
-          required
-        />
-        <FormField
-          label={copy.labels.email}
-          name="email"
-          type="email"
-          autoComplete="email"
-          placeholder={copy.placeholders.email}
-          required
-        />
-        <label className="space-y-2">
-          <span className="text-sm font-medium">{copy.labels.countryCode}</span>
-          <span className="relative block">
-            <select
-              name="countryCode"
-              required
-              defaultValue=""
-              className="border-input bg-background placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 min-h-11 w-full appearance-none rounded-lg border px-3 pr-10 text-sm transition-shadow outline-none focus-visible:ring-3"
-            >
-              <option value="" disabled>
-                {copy.countryDefaultOption}
-              </option>
-              {countryCodes.map((countryCode) => (
-                <option key={countryCode} value={countryCode}>
-                  {countryCode}
+    <form
+      ref={formRef}
+      action={handleSubmit}
+      aria-busy={isPending}
+      className="space-y-6"
+      onFocusCapture={handleFormFocus}
+    >
+      <fieldset className="space-y-4">
+        <legend className="text-sm font-semibold">
+          {copy.fieldGroups.requiredLegend}
+        </legend>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <FormField
+            label={copy.labels.name}
+            helper={copy.helpers.name}
+            name="name"
+            autoComplete="name"
+            placeholder={copy.placeholders.name}
+            required
+          />
+          <FormField
+            label={copy.labels.email}
+            helper={copy.helpers.email}
+            name="email"
+            type="email"
+            autoComplete="email"
+            placeholder={copy.placeholders.email}
+            required
+          />
+          <label className="space-y-2">
+            <span className="text-sm font-medium">
+              {copy.labels.countryCode}
+            </span>
+            <span className="relative block">
+              <select
+                name="countryCode"
+                required
+                defaultValue=""
+                aria-describedby="countryCode-helper"
+                className="border-input bg-background placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 min-h-11 w-full appearance-none rounded-lg border px-3 pr-10 text-sm transition-shadow outline-none focus-visible:ring-3"
+              >
+                <option value="" disabled>
+                  {copy.countryDefaultOption}
                 </option>
-              ))}
-            </select>
-            <ChevronDown
-              aria-hidden="true"
-              className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2"
-            />
-          </span>
-        </label>
-        <FormField
-          label={copy.labels.city}
-          name="city"
-          autoComplete="address-level2"
-          placeholder={copy.placeholders.city}
-          required
-        />
-        <FormField
-          label={copy.labels.instagram}
-          name="instagram"
-          autoComplete="off"
-          placeholder={copy.placeholders.instagram}
-        />
-        <FormField
-          label={copy.labels.referralCode}
-          name="referralCode"
-          autoComplete="off"
-          placeholder={copy.placeholders.referralCode}
-        />
-      </div>
+                {countryCodes.map((countryCode) => (
+                  <option key={countryCode} value={countryCode}>
+                    {countryCode}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown
+                aria-hidden="true"
+                className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2"
+              />
+            </span>
+            <span
+              id="countryCode-helper"
+              className="text-muted-foreground block text-xs leading-5"
+            >
+              {copy.helpers.countryCode}
+            </span>
+          </label>
+          <FormField
+            label={copy.labels.city}
+            helper={copy.helpers.city}
+            name="city"
+            autoComplete="address-level2"
+            placeholder={copy.placeholders.city}
+            required
+          />
+        </div>
+      </fieldset>
 
-      <FormField
-        label={copy.labels.heardAbout}
-        name="heardAbout"
-        autoComplete="off"
-        placeholder={copy.placeholders.heardAbout}
-      />
+      <fieldset className="space-y-4">
+        <legend className="text-sm font-semibold">
+          {copy.fieldGroups.optionalLegend}
+        </legend>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <FormField
+            label={copy.labels.instagram}
+            helper={copy.helpers.instagram}
+            name="instagram"
+            autoComplete="off"
+            placeholder={copy.placeholders.instagram}
+          />
+          <FormField
+            label={copy.labels.referralCode}
+            helper={copy.helpers.referralCode}
+            name="referralCode"
+            autoComplete="off"
+            placeholder={copy.placeholders.referralCode}
+          />
+        </div>
+
+        <FormField
+          label={copy.labels.heardAbout}
+          helper={copy.helpers.heardAbout}
+          name="heardAbout"
+          autoComplete="off"
+          placeholder={copy.placeholders.heardAbout}
+        />
+      </fieldset>
 
       <label className="border-border bg-background/70 flex gap-3 rounded-lg border p-3 text-sm leading-6">
         <input
           type="checkbox"
           name="consent"
-          className="border-input accent-primary mt-1 size-4 rounded"
+          className="border-input accent-primary mt-1 size-5 rounded"
           required
+          aria-describedby="consent-helper"
         />
-        <span>{copy.labels.consent}</span>
+        <span>
+          {copy.labels.consent}
+          <span
+            id="consent-helper"
+            className="text-muted-foreground mt-1 block text-xs leading-5"
+          >
+            {copy.helpers.consent}
+          </span>
+        </span>
       </label>
 
       <label className="sr-only">
@@ -183,6 +243,7 @@ export function SupporterSignupForm({
 
 function FormField({
   label,
+  helper,
   name,
   type = "text",
   autoComplete,
@@ -190,12 +251,15 @@ function FormField({
   required = false,
 }: {
   label: string;
+  helper: string;
   name: string;
   type?: string;
   autoComplete: string;
   placeholder: string;
   required?: boolean;
 }) {
+  const helperId = `${name}-helper`;
+
   return (
     <label className="space-y-2">
       <span className="text-sm font-medium">{label}</span>
@@ -205,8 +269,15 @@ function FormField({
         autoComplete={autoComplete}
         placeholder={placeholder}
         required={required}
+        aria-describedby={helperId}
         className="border-input bg-background placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 min-h-11 w-full rounded-lg border px-3 text-sm transition-shadow outline-none focus-visible:ring-3"
       />
+      <span
+        id={helperId}
+        className="text-muted-foreground block text-xs leading-5"
+      >
+        {helper}
+      </span>
     </label>
   );
 }

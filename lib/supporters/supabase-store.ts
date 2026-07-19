@@ -10,6 +10,7 @@ type SupporterRow = {
   email_normalized: string;
   status: "pending" | "verified" | "unsubscribed";
   personal_referral_code: string | null;
+  unsubscribed_at?: string | null;
 };
 
 type TokenRow = {
@@ -67,6 +68,63 @@ export function createSupabaseSupporterStore(
         supporter_id: row.supporter_id,
         token_hash: `\\x${row.token_hash}`,
         expires_at: row.expires_at.toISOString(),
+      });
+      if (error) throw error;
+    },
+    async markVerificationSent(params) {
+      const { error } = await supabase
+        .from("supporters")
+        .update({
+          verification_sent_at: params.verification_sent_at.toISOString(),
+        })
+        .eq("id", params.supporter_id);
+      if (error) throw error;
+    },
+    async countVerificationTokensSince(params) {
+      const { count, error } = await supabase
+        .from("verification_tokens")
+        .select("id", { count: "exact", head: true })
+        .eq("supporter_id", params.supporter_id)
+        .gte("created_at", params.since.toISOString());
+      if (error) throw error;
+      return count ?? 0;
+    },
+    async unsubscribeSupporter(params) {
+      const { error } = await supabase
+        .from("supporters")
+        .update({
+          status: "unsubscribed",
+          unsubscribed_at: params.unsubscribed_at.toISOString(),
+        })
+        .eq("id", params.supporter_id);
+      if (error) throw error;
+    },
+    async suppressSupporter(params) {
+      const { error } = await supabase
+        .from("supporters")
+        .update({
+          status: "unsubscribed",
+          unsubscribed_at: params.suppressed_at.toISOString(),
+        })
+        .eq("id", params.supporter_id);
+      if (error) throw error;
+    },
+    async isSuppressed(supporterId) {
+      const { data, error } = await supabase
+        .from("supporters")
+        .select("status,unsubscribed_at")
+        .eq("id", supporterId)
+        .maybeSingle<Pick<SupporterRow, "status" | "unsubscribed_at">>();
+      if (error) throw error;
+      return Boolean(data?.unsubscribed_at || data?.status === "unsubscribed");
+    },
+    async recordEmailEvent(row) {
+      if (!row.supporter_id) return;
+      const { error } = await supabase.from("email_events").insert({
+        supporter_id: row.supporter_id,
+        type: row.type,
+        provider_payload: row.provider_payload ?? null,
+        created_at: row.created_at.toISOString(),
       });
       if (error) throw error;
     },
@@ -128,6 +186,9 @@ function mapSupporter(row: SupporterRow): SupporterRecord {
     email_normalized: row.email_normalized,
     status: row.status,
     personal_referral_code: row.personal_referral_code,
+    unsubscribed_at: row.unsubscribed_at
+      ? new Date(row.unsubscribed_at)
+      : undefined,
   };
 }
 

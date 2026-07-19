@@ -1,6 +1,17 @@
 import Image from "next/image";
-import Link from "next/link";
-import { ArrowRight, Check, Mail, Package, PlayCircle } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  CircleCheck,
+  Mail,
+  MailCheck,
+  Package,
+  PlayCircle,
+  ShieldCheck,
+} from "lucide-react";
+import { TrackedLink } from "@/components/analytics/tracked-link";
+import { FunnelPageTracker } from "@/components/analytics/funnel-page-tracker";
+import { InteractiveHeroShell } from "@/components/sections/interactive-hero-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FaqAccordion } from "@/components/sections/faq-accordion";
@@ -24,6 +35,46 @@ type CommunityEvidence = {
 };
 
 const communityEvidence: CommunityEvidence[] = [];
+const stepIcons = [CircleCheck, MailCheck, ShieldCheck] as const;
+
+function SectionCta({
+  copy,
+  align = "left",
+  surface = "light",
+}: LandingPageProps & {
+  align?: "left" | "center";
+  surface?: "light" | "dark";
+}) {
+  return (
+    <div
+      className={
+        align === "center"
+          ? "mt-8 flex justify-center"
+          : "mt-8 flex justify-start"
+      }
+    >
+      <Button
+        size="lg"
+        nativeButton={false}
+        render={
+          <TrackedLink
+            href={copy.hero.primaryCta.href}
+            eventName="primary_cta_clicked"
+            eventProperties={{ placement: "section_cta" }}
+          />
+        }
+        className={
+          surface === "dark"
+            ? "bg-lime text-lime-foreground hover:bg-lime/90 min-h-12 px-5"
+            : "min-h-12 px-5"
+        }
+      >
+        {copy.hero.primaryCta.label}
+        <ArrowRight aria-hidden="true" />
+      </Button>
+    </div>
+  );
+}
 
 function SectionIntro({ copy, align = "left" }: SectionIntroProps) {
   return (
@@ -45,83 +96,80 @@ function SectionIntro({ copy, align = "left" }: SectionIntroProps) {
   );
 }
 
-function HeroMedia({ copy }: LandingPageProps) {
-  const video = copy.hero.video;
-
-  return (
-    <div className="relative mx-auto grid w-full max-w-xl grid-cols-5 gap-4 lg:max-w-none">
-      <div className="col-span-3 flex flex-col gap-4">
-        <div className="border-border bg-card shadow-card relative aspect-[1.08] overflow-hidden rounded-lg border">
-          <Image
-            src={video.posterSrc}
-            alt={copy.hero.posterAlt}
-            fill
-            priority
-            sizes="(min-width: 1024px) 22vw, 58vw"
-            className="object-cover"
-          />
-          {video.enabled ? (
-            <video
-              className="absolute inset-0 size-full object-cover"
-              poster={video.posterSrc}
-              preload="none"
-              controls
-              aria-label={video.controlsLabel}
-            >
-              {video.sources.map((source) => (
-                <source key={source.src} src={source.src} type={source.type} />
-              ))}
-              <track src={video.captionsSrc} kind="captions" />
-            </video>
-          ) : null}
-        </div>
-        <div className="border-border bg-secondary/70 shadow-soft hidden aspect-[1.08] rounded-lg border sm:block" />
-      </div>
-      <div className="border-border bg-secondary shadow-card col-span-2 min-h-full rounded-lg border" />
-    </div>
-  );
-}
-
 function HeroSection({ copy }: LandingPageProps) {
   return (
-    <section className="bg-dot-grid px-4 py-14 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
-      <div className="mx-auto grid min-h-[calc(100svh-8rem)] w-full max-w-7xl items-center gap-12 lg:grid-cols-[1fr_0.92fr]">
-        <div className="max-w-3xl">
-          <Badge variant="outline" className="bg-background/80 mb-6">
+    <InteractiveHeroShell filterId="hero-goo-filter">
+      <div className="relative z-10 mx-auto flex min-h-[calc(100svh-8rem)] w-full max-w-7xl flex-col items-center justify-center text-center">
+        <div className="max-w-4xl">
+          <Image
+            src="/images/logo.png"
+            alt={copy.brand.name}
+            width={88}
+            height={88}
+            priority
+            className="shadow-soft mx-auto mb-6 rounded-full"
+          />
+          <Badge className="bg-lime text-lime-foreground mb-6">
             {copy.hero.badgeLabel}
           </Badge>
-          <p className="text-primary mb-5 max-w-xl text-sm font-medium uppercase">
+          <p className="text-lime mx-auto mb-5 max-w-2xl text-sm font-medium uppercase">
             {copy.hero.mission}
           </p>
-          <h1 className="text-display max-w-4xl">{copy.hero.headline}</h1>
-          <p className="text-muted-foreground mt-6 max-w-2xl text-lg leading-8 sm:text-xl">
+          <h1 className="text-display mx-auto max-w-4xl">
+            {copy.hero.headline}
+          </h1>
+          <p className="text-background/78 mx-auto mt-6 max-w-2xl text-lg leading-8 sm:text-xl">
             {copy.hero.supportingLine}
           </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <div
+            data-hero-no-highlight
+            className="mx-auto mt-8 flex w-fit flex-col justify-center gap-3 sm:flex-row"
+          >
             <Button
               size="lg"
               nativeButton={false}
-              render={<Link href={copy.hero.primaryCta.href} />}
-              className="min-h-12 px-5"
+              render={
+                <TrackedLink
+                  href={copy.hero.primaryCta.href}
+                  eventName="primary_cta_clicked"
+                  eventProperties={{ placement: "hero" }}
+                />
+              }
+              className="bg-lime text-lime-foreground hover:bg-lime/90 min-h-12 px-5"
             >
               {copy.hero.primaryCta.label}
               <ArrowRight aria-hidden="true" />
             </Button>
             <Button
               size="lg"
-              variant="outline"
               nativeButton={false}
-              render={<Link href={copy.hero.secondaryCta.href} />}
-              className="min-h-12 px-5"
+              render={
+                <TrackedLink
+                  href={copy.hero.secondaryCta.href}
+                  eventName="secondary_cta_clicked"
+                  eventProperties={{ placement: "hero" }}
+                />
+              }
+              className="bg-lime text-lime-foreground hover:bg-lime/90 min-h-12 px-5"
             >
               {copy.hero.secondaryCta.label}
               <PlayCircle aria-hidden="true" />
             </Button>
           </div>
+          <ul className="mx-auto mt-8 grid max-w-3xl gap-3 sm:grid-cols-3">
+            {copy.hero.proofPoints.map((point) => (
+              <li
+                key={point.id}
+                className="border-background/18 bg-background/10 text-background flex min-h-12 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-medium backdrop-blur"
+              >
+                <Check aria-hidden="true" className="text-lime size-4" />
+                {point.label}
+              </li>
+            ))}
+          </ul>
         </div>
-        <HeroMedia copy={copy} />
       </div>
-    </section>
+    </InteractiveHeroShell>
   );
 }
 
@@ -205,13 +253,61 @@ function BenefitsSection({ copy }: LandingPageProps) {
   );
 }
 
+function SupporterPathSection({ copy }: LandingPageProps) {
+  return (
+    <section className="bg-secondary/70 py-section px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <SectionIntro copy={copy.supporterPath} align="center" />
+        <div className="mt-10 grid gap-4 md:grid-cols-3">
+          {copy.supporterPath.steps.map((step, index) => {
+            const Icon = stepIcons[index] ?? CircleCheck;
+
+            return (
+              <article
+                key={step.id}
+                className="border-border bg-card shadow-soft rounded-lg border p-6"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="bg-primary text-primary-foreground flex size-10 items-center justify-center rounded-lg text-sm font-semibold">
+                    {index + 1}
+                  </span>
+                  <Icon aria-hidden="true" className="text-primary size-5" />
+                </div>
+                <h3 className="mt-6 text-xl font-semibold">{step.title}</h3>
+                <p className="text-muted-foreground mt-3 text-sm leading-6">
+                  {step.body}
+                </p>
+              </article>
+            );
+          })}
+        </div>
+        <SectionCta copy={copy} align="center" />
+      </div>
+    </section>
+  );
+}
+
 function CommunityEvidenceGrid({
   evidence,
+  emptyStateLabel,
 }: {
   evidence: CommunityEvidence[];
+  emptyStateLabel: string;
 }) {
   if (evidence.length === 0) {
-    return null;
+    return (
+      <div className="border-border bg-card shadow-soft mx-auto mt-10 max-w-2xl rounded-lg border p-6 text-center">
+        <ShieldCheck
+          aria-hidden="true"
+          className="text-primary mx-auto size-6"
+        />
+        <p className="mt-4 font-semibold">{emptyStateLabel}</p>
+        <p className="text-muted-foreground mt-2 text-sm leading-6">
+          Supporter moments, testimonials, and counts should be added only after
+          they can be verified.
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -252,7 +348,11 @@ function CommunitySection({ copy }: LandingPageProps) {
     >
       <div className="mx-auto max-w-7xl">
         <SectionIntro copy={copy.community} align="center" />
-        <CommunityEvidenceGrid evidence={communityEvidence} />
+        <SectionCta copy={copy} align="center" />
+        <CommunityEvidenceGrid
+          evidence={communityEvidence}
+          emptyStateLabel={copy.community.emptyStateLabel}
+        />
       </div>
     </section>
   );
@@ -285,14 +385,38 @@ function MerchandiseSection({ copy }: LandingPageProps) {
         </div>
         <div>
           <SectionIntro copy={copy.merchandise} />
-          <Button
-            nativeButton={false}
-            render={<Link href={copy.merchandise.notifyCta.href} />}
-            className="mt-8 min-h-12 px-5"
-          >
-            {copy.merchandise.notifyCta.label}
-            <ArrowRight aria-hidden="true" />
-          </Button>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <Button
+              size="lg"
+              nativeButton={false}
+              render={
+                <TrackedLink
+                  href={copy.hero.primaryCta.href}
+                  eventName="primary_cta_clicked"
+                  eventProperties={{ placement: "merchandise" }}
+                />
+              }
+              className="min-h-12 px-5"
+            >
+              {copy.hero.primaryCta.label}
+              <ArrowRight aria-hidden="true" />
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              nativeButton={false}
+              render={
+                <TrackedLink
+                  href={copy.merchandise.notifyCta.href}
+                  eventName="secondary_cta_clicked"
+                  eventProperties={{ placement: "merchandise_notify" }}
+                />
+              }
+              className="min-h-12 px-5"
+            >
+              {copy.merchandise.notifyCta.label}
+            </Button>
+          </div>
         </div>
       </div>
     </section>
@@ -311,6 +435,17 @@ function JoinSection({ copy }: LandingPageProps) {
           <p className="text-muted-foreground mt-5 text-base leading-8 sm:text-lg">
             {copy.join.body}
           </p>
+          <div className="mt-8 grid gap-3">
+            {copy.hero.proofPoints.map((point) => (
+              <div
+                key={point.id}
+                className="border-border bg-background/70 flex min-h-12 items-center gap-3 rounded-lg border px-4 text-sm font-medium"
+              >
+                <Check aria-hidden="true" className="text-primary size-4" />
+                {point.label}
+              </div>
+            ))}
+          </div>
         </div>
         <div className="border-border bg-secondary/70 rounded-lg border p-5 sm:p-6">
           <Mail aria-hidden="true" className="text-primary mb-5 size-6" />
@@ -350,8 +485,10 @@ function FaqSection({ copy }: LandingPageProps) {
 export function LandingSections({ copy }: LandingPageProps) {
   return (
     <>
+      <FunnelPageTracker />
       <HeroSection copy={copy} />
       <StorySection copy={copy} />
+      <SupporterPathSection copy={copy} />
       <VisionSection copy={copy} />
       <BenefitsSection copy={copy} />
       <CommunitySection copy={copy} />
