@@ -10,7 +10,6 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { TrackedLink } from "@/components/analytics/tracked-link";
-import { SupporterSignupForm } from "@/components/forms/supporter-signup-form";
 import { FunnelPageTracker } from "@/components/analytics/funnel-page-tracker";
 import { InteractiveHeroShell } from "@/components/sections/interactive-hero-shell";
 import { Badge } from "@/components/ui/badge";
