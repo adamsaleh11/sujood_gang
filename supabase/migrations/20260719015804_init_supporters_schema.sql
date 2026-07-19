@@ -135,3 +135,11 @@ revoke all on public.supporters from anon, authenticated;
 revoke all on public.verification_tokens from anon, authenticated;
 revoke all on public.email_events from anon, authenticated;
 revoke all on public.rate_limit_events from anon, authenticated;
+
+-- The server-side Supabase client uses the service role key. That role bypasses
+-- RLS, but it still needs table privileges after the explicit revokes above.
+grant usage on schema public to service_role;
+grant all on public.supporters to service_role;
+grant all on public.verification_tokens to service_role;
+grant all on public.email_events to service_role;
+grant all on public.rate_limit_events to service_role;
