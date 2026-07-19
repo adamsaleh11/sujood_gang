@@ -66,9 +66,6 @@ create table public.supporters (
   verification_sent_at timestamptz,
   verified_at timestamptz,
   unsubscribed_at timestamptz,
-  suppressed_at timestamptz,
-  suppression_reason text
-    check (suppression_reason is null or suppression_reason in ('hard_bounce', 'complained')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -117,21 +114,14 @@ create index rate_limit_events_key_created_at_idx
 -- ---------------------------------------------------------------------------
 create table public.email_events (
   id uuid primary key default gen_random_uuid(),
-  supporter_id uuid references public.supporters (id) on delete cascade,
+  supporter_id uuid not null references public.supporters (id) on delete cascade,
   type public.email_event_type not null,
-  provider_event_id text unique,
-  provider_message_id text,
-  email_normalized text,
   provider_payload jsonb,
   created_at timestamptz not null default now()
 );
 
 create index email_events_supporter_id_idx
   on public.email_events (supporter_id);
-create index email_events_provider_message_id_idx
-  on public.email_events (provider_message_id);
-create index email_events_email_normalized_idx
-  on public.email_events (email_normalized);
 
 -- ---------------------------------------------------------------------------
 -- Row Level Security — enable + default deny (see SECURITY MODEL above)

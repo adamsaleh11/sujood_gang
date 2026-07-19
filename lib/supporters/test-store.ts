@@ -1,5 +1,4 @@
 import type {
-  EmailEventRecord,
   SupporterRecord,
   SupporterStore,
   VerificationTokenRecord,
@@ -8,16 +7,13 @@ import type {
 export function createInMemorySupporterStore(): SupporterStore & {
   supporters: SupporterRecord[];
   tokens: VerificationTokenRecord[];
-  emailEvents: EmailEventRecord[];
 } {
   const supporters: SupporterRecord[] = [];
   const tokens: VerificationTokenRecord[] = [];
-  const emailEvents: EmailEventRecord[] = [];
 
   return {
     supporters,
     tokens,
-    emailEvents,
     async findSupporterByEmail(email) {
       return (
         supporters.find((supporter) => supporter.email_normalized === email) ??
@@ -61,26 +57,10 @@ export function createInMemorySupporterStore(): SupporterStore & {
         token_hash: row.token_hash,
         expires_at: row.expires_at,
         used_at: null,
-        created_at: row.now,
       });
-    },
-    async markVerificationSent(params) {
-      const supporter = supporters.find(
-        (item) => item.id === params.supporter_id,
-      );
-      if (supporter) {
-        supporter.verification_sent_at = params.verification_sent_at;
-      }
     },
     async findVerificationTokenByHash(tokenHash) {
       return tokens.find((token) => token.token_hash === tokenHash) ?? null;
-    },
-    async countVerificationTokensSince(supporterId, since) {
-      return tokens.filter(
-        (token) =>
-          token.supporter_id === supporterId &&
-          token.created_at.getTime() >= since.getTime(),
-      ).length;
     },
     async findSupporterById(id) {
       return supporters.find((supporter) => supporter.id === id) ?? null;
@@ -97,48 +77,7 @@ export function createInMemorySupporterStore(): SupporterStore & {
       }
       supporter.status = "verified";
       supporter.personal_referral_code ??= params.personal_referral_code;
-      supporter.verified_at = params.verified_at;
       return supporter;
-    },
-    async unsubscribeSupporter(params) {
-      const supporter = supporters.find(
-        (item) => item.id === params.supporter_id,
-      );
-      if (supporter) {
-        supporter.status = "unsubscribed";
-        supporter.unsubscribed_at = params.unsubscribed_at;
-      }
-    },
-    async suppressSupporter(params) {
-      const supporter = supporters.find(
-        (item) => item.id === params.supporter_id,
-      );
-      if (supporter) {
-        supporter.suppressed_at = params.suppressed_at;
-        supporter.suppression_reason = params.suppression_reason;
-      }
-    },
-    async isSuppressed(supporterId) {
-      const supporter = supporters.find((item) => item.id === supporterId);
-      return Boolean(
-        supporter?.unsubscribed_at ||
-        supporter?.suppressed_at ||
-        supporter?.status === "unsubscribed",
-      );
-    },
-    async recordEmailEvent(row) {
-      if (
-        row.provider_event_id &&
-        emailEvents.some(
-          (event) => event.provider_event_id === row.provider_event_id,
-        )
-      ) {
-        return;
-      }
-      emailEvents.push({
-        id: `email-event-${emailEvents.length + 1}`,
-        ...row,
-      });
     },
   };
 }

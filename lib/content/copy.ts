@@ -25,42 +25,6 @@ type FaqCopy = {
   answer: string;
 };
 
-type SignupFormCopy = {
-  labels: {
-    name: string;
-    email: string;
-    countryCode: string;
-    city: string;
-    instagram: string;
-    referralCode: string;
-    heardAbout: string;
-    consent: string;
-  };
-  placeholders: {
-    name: string;
-    email: string;
-    countryCode: string;
-    city: string;
-    instagram: string;
-    referralCode: string;
-    heardAbout: string;
-  };
-  honeypotLabel: string;
-  countryDefaultOption: string;
-  submitLabel: string;
-  pendingLabel: string;
-  statusLabels: {
-    created: string;
-    pending: string;
-    alreadyVerified: string;
-    accepted: string;
-    rateLimited: string;
-    validationError: string;
-    emailSendFailed: string;
-    unexpectedError: string;
-  };
-};
-
 type EmailCopy = {
   subject: string;
   preview: string;
@@ -121,7 +85,6 @@ type SiteCopy = {
   };
   strengthThroughSubmission: EditorialSectionCopy;
   vision: EditorialSectionCopy;
-  memberBenefitsIntro: EditorialSectionCopy;
   community: EditorialSectionCopy & {
     emptyStateLabel: string;
   };
@@ -145,7 +108,6 @@ type SiteCopy = {
     successTitle: string;
     successBody: string;
     confirmationExpectation: string;
-    form: SignupFormCopy;
   };
   faq: FaqCopy[];
   footer: {
@@ -322,11 +284,6 @@ export const siteCopy = {
     title: "A global community, built with restraint", // DRAFT(ai)
     body: "The vision is to build the world's largest community united by sujood: a visible network of supporters connected by belonging rather than noise. It starts with a free signup, a confirmed email, and a shared sense that this identity can travel across countries and cities without losing its center. Scale matters only if it remains human. Sujood Gang should feel global in ambition and personal in tone.", // DRAFT(ai)
   },
-  memberBenefitsIntro: {
-    eyebrow: "What members receive", // DRAFT(ai)
-    title: "A supporter path with clear expectations", // DRAFT(ai)
-    body: "The first version keeps the promise simple: supporters join for free, confirm their email, and receive only the benefits the project can honestly stand behind today.", // DRAFT(ai)
-  },
   community: {
     eyebrow: "Community", // DRAFT(ai)
     title: "Real support, shown only when it is real", // DRAFT(ai)
@@ -395,45 +352,6 @@ export const siteCopy = {
       "We sent a confirmation email. Once you confirm, you will be added to the supporter list and receive occasional updates.", // DRAFT(ai)
     confirmationExpectation:
       "If the email does not arrive, check spam or promotions before trying again.", // DRAFT(ai)
-    form: {
-      labels: {
-        name: "Name", // DRAFT(ai)
-        email: "Email", // DRAFT(ai)
-        countryCode: "Country", // DRAFT(ai)
-        city: "City", // DRAFT(ai)
-        instagram: "Instagram (optional)", // DRAFT(ai)
-        referralCode: "Referral code", // DRAFT(ai)
-        heardAbout: "How did you hear about us?", // DRAFT(ai)
-        consent:
-          "I agree to join the supporter list and receive signup emails from Sujood Gang.", // DRAFT(ai)
-      },
-      placeholders: {
-        name: "Your name", // DRAFT(ai)
-        email: "you@example.com", // DRAFT(ai)
-        countryCode: "Select country", // DRAFT(ai)
-        city: "Your city", // DRAFT(ai)
-        instagram: "@handle", // DRAFT(ai)
-        referralCode: "Referral code", // DRAFT(ai)
-        heardAbout: "Friend, Instagram, search, or other", // DRAFT(ai)
-      },
-      honeypotLabel: "Website", // DRAFT(ai)
-      countryDefaultOption: "Select country", // DRAFT(ai)
-      submitLabel: "Join as a supporter", // DRAFT(ai)
-      pendingLabel: "Joining", // DRAFT(ai)
-      statusLabels: {
-        created:
-          "Check your inbox to verify your email and complete your signup.", // DRAFT(ai)
-        pending:
-          "You are already on the list pending email verification. Check your inbox for the confirmation link.", // DRAFT(ai)
-        alreadyVerified: "You are already verified as a supporter.", // DRAFT(ai)
-        accepted: "Thank you. If this signup is valid, we will process it.", // DRAFT(ai)
-        rateLimited: "Too many attempts. Please try again later.", // DRAFT(ai)
-        validationError: "Review the form fields and try again.", // DRAFT(ai)
-        emailSendFailed:
-          "We could not send the confirmation email. Please try again shortly.", // DRAFT(ai)
-        unexpectedError: "Something went wrong. Please try again.", // DRAFT(ai)
-      },
-    },
   },
   faq: [
     {
@@ -443,28 +361,10 @@ export const siteCopy = {
         "Sujood Gang is a community vision called Strength Through Submission. It aspires to become a free supporter network united by sujood, discipline, humility, and belonging.", // DRAFT(ai)
     },
     {
-      id: "why-was-it-created", // DRAFT(ai)
-      question: "Why was Sujood Gang created?", // DRAFT(ai)
+      id: "who-can-join", // DRAFT(ai)
+      question: "Who can join?", // DRAFT(ai)
       answer:
-        "Sujood Gang was created to gather people around a public identity rooted in sujood, humility, discipline, and belonging rather than noise or performance.", // DRAFT(ai)
-    },
-    {
-      id: "why-should-i-join", // DRAFT(ai)
-      question: "Why should I join?", // DRAFT(ai)
-      answer:
-        "Join if you respect the mission and want to be counted among the early supporters helping the vision grow into a global community.", // DRAFT(ai)
-    },
-    {
-      id: "what-do-i-get", // DRAFT(ai)
-      question: "What do I get?", // DRAFT(ai)
-      answer:
-        "Supporters receive community belonging, occasional updates, early access to upcoming merchandise when available, and a personal referral link after verification.", // DRAFT(ai)
-    },
-    {
-      id: "how-do-i-become-part-of-it", // DRAFT(ai)
-      question: "How do I become part of it?", // DRAFT(ai)
-      answer:
-        "Fill out the supporter form, verify your email, and you will be added to the supporter database once confirmation is complete.", // DRAFT(ai)
+        "Anyone who respects the purpose of Sujood Gang may sign up as a supporter. Final community guidelines and participation details are pending client confirmation.", // DRAFT(ai)
     },
     {
       id: "does-it-cost-anything", // DRAFT(ai)
@@ -479,6 +379,18 @@ export const siteCopy = {
         "You will be asked to confirm your email. After confirmation, your details are added to the supporter list and may be used to send occasional project updates.", // DRAFT(ai)
     },
     {
+      id: "what-emails-will-i-receive", // DRAFT(ai)
+      question: "What emails will I receive?", // DRAFT(ai)
+      answer:
+        "You should expect a confirmation email, a welcome email after confirmation, and occasional updates about the project as details become ready to share.", // DRAFT(ai)
+    },
+    {
+      id: "where-is-sujood-gang-active", // DRAFT(ai)
+      question: "Where is Sujood Gang active?", // DRAFT(ai)
+      answer:
+        "The vision is global, and the current signup is online. Specific locations, chapters, events, or local activity have not been confirmed.", // DRAFT(ai)
+    },
+    {
       id: "is-merch-available", // DRAFT(ai)
       question: "Is merchandise available?", // DRAFT(ai)
       answer:
@@ -489,6 +401,12 @@ export const siteCopy = {
       question: "How will my data be used?", // DRAFT(ai)
       answer:
         "Your signup details are used to manage your supporter record, send requested emails, and understand where interest is coming from. Full legal and privacy details are pending client confirmation.", // DRAFT(ai)
+    },
+    {
+      id: "can-i-unsubscribe", // DRAFT(ai)
+      question: "Can I unsubscribe?", // DRAFT(ai)
+      answer:
+        "Yes. Marketing or update emails should include an unsubscribe option where required. Unsubscribing removes you from future non-transactional emails.", // DRAFT(ai)
     },
   ],
   footer: {
@@ -656,5 +574,4 @@ export type {
   LinkCopy,
   MemberBenefitCopy,
   SiteCopy,
-  SignupFormCopy,
 };
