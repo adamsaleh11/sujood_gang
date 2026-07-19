@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" role="img">
+  <defs>
+    <linearGradient id="canvas" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#fbfbf2"/>
+      <stop offset="0.55" stop-color="#eef6e7"/>
+      <stop offset="1" stop-color="#183f18"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="35%" cy="25%" r="65%">
+      <stop offset="0" stop-color="#c6f144" stop-opacity="0.62"/>
+      <stop offset="0.52" stop-color="#57c34d" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#173f18" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="2" fill="#173f18" opacity="0.12"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="1200" fill="url(#canvas)"/>
+  <rect width="1200" height="1200" fill="url(#grid)"/>
+  <rect width="1200" height="1200" fill="url(#glow)"/>
+  <circle cx="600" cy="610" r="278" fill="none" stroke="#173f18" stroke-width="26" opacity="0.18"/>
+  <circle cx="600" cy="610" r="198" fill="none" stroke="#286822" stroke-width="18" opacity="0.28"/>
+  <path d="M600 294c118 132 177 244 177 337 0 101-76 181-177 181s-177-80-177-181c0-93 59-205 177-337Z" fill="#105112" opacity="0.9"/>
+  <path d="M600 373c80 99 120 181 120 247 0 69-52 124-120 124s-120-55-120-124c0-66 40-148 120-247Z" fill="#aae832" opacity="0.88"/>
+  <path d="M238 874c181-63 362-94 543-94 69 0 130 4 181 13" fill="none" stroke="#fbfbf2" stroke-width="34" stroke-linecap="round" opacity="0.78"/>
+  <path d="M266 933c139-43 287-64 444-64 92 0 166 8 224 23" fill="none" stroke="#173f18" stroke-width="18" stroke-linecap="round" opacity="0.22"/>
+</svg>

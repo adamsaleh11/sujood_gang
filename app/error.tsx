@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { siteCopy } from "@/lib/content/copy";
 
 export default function Error({
   error,
@@ -17,13 +18,14 @@ export default function Error({
 
   return (
     <main className="bg-dot-grid py-section flex flex-1 flex-col items-center justify-center gap-6 px-6 text-center">
-      <p className="text-muted-foreground font-mono text-sm">500</p>
-      <h1 className="text-display-sm">Something went wrong.</h1>
-      <p className="text-muted-foreground max-w-md">
-        An unexpected error occurred. Try again — if it keeps happening, come
-        back a little later.
+      <p className="text-muted-foreground font-mono text-sm">
+        {siteCopy.systemPages.error.code}
       </p>
-      <Button onClick={reset}>Try again</Button>
+      <h1 className="text-display-sm">{siteCopy.systemPages.error.title}</h1>
+      <p className="text-muted-foreground max-w-md">
+        {siteCopy.systemPages.error.body}
+      </p>
+      <Button onClick={reset}>{siteCopy.systemPages.error.ctaLabel}</Button>
     </main>
   );
 }
