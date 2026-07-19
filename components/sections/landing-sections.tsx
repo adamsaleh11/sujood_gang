@@ -38,6 +38,30 @@ type CommunityEvidence = {
 
 const communityEvidence: CommunityEvidence[] = [];
 const stepIcons = [CircleCheck, MailCheck, ShieldCheck] as const;
+const heroVerseArabicSegments = [
+  "ٱللَّهُ لَآ إِلَـٰهَ إِلَّا هُوَ",
+  "ٱلْحَىُّ ٱلْقَيُّومُ",
+  "لَا تَأْخُذُهُۥ سِنَةٌۭ وَلَا نَوْمٌۭ",
+  "لَّهُۥ مَا فِى ٱلسَّمَـٰوَٰتِ وَمَا فِى ٱلْأَرْضِ",
+  "مَن ذَا ٱلَّذِى يَشْفَعُ عِندَهُۥٓ إِلَّا بِإِذْنِهِۦ",
+  "يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ",
+  "وَلَا يُحِيطُونَ بِشَىْءٍۢ مِّنْ عِلْمِهِۦٓ إِلَّا بِمَا شَآءَ",
+  "وَسِعَ كُرْسِيُّهُ ٱلسَّمَـٰوَٰتِ وَٱلْأَرْضَ",
+  "وَلَا يَـُٔودُهُۥ حِفْظُهُمَا",
+  "وَهُوَ ٱلْعَلِىُّ ٱلْعَظِيمُ ٢٥٥",
+] as const;
+const heroVerseTranslationSegments = [
+  "Allah! There is no god worthy of worship except Him,",
+  "the Ever-Living, All-Sustaining.",
+  "Neither drowsiness nor sleep overtakes Him.",
+  "To Him belongs whatever is in the heavens and whatever is on the earth.",
+  "Who could possibly intercede with Him without His permission?",
+  "He fully knows what is ahead of them and what is behind them,",
+  "but no one can grasp any of His knowledge except what He wills to reveal.",
+  "His Seat encompasses the heavens and the earth,",
+  "and the preservation of both does not tire Him.",
+  "For He is the Most High, the Greatest.",
+] as const;
 
 function SectionCta({
   copy,
@@ -98,11 +122,54 @@ function SectionIntro({ copy, align = "left" }: SectionIntroProps) {
   );
 }
 
+function HeroVerse() {
+  return (
+    <>
+      <blockquote
+        dir="rtl"
+        lang="ar"
+        aria-label="Ayat al-Kursi Arabic"
+        data-hero-no-highlight
+        className="absolute inset-x-6 top-0 z-[1] flex h-[25%] flex-row flex-wrap content-start justify-start gap-x-3 gap-y-2 overflow-hidden pt-4 text-right text-xl leading-[2] text-background sm:pt-6 sm:text-2xl lg:text-3xl"
+      >
+        {heroVerseArabicSegments.map((segment) => (
+          <span
+            key={segment}
+            tabIndex={0}
+            data-hero-no-highlight
+            className="hero-verse-segment pointer-events-auto rounded-sm outline-none"
+          >
+            {segment}
+          </span>
+        ))}
+      </blockquote>
+      <figcaption
+        lang="en"
+        aria-label="Ayat al-Kursi English translation"
+        data-hero-no-highlight
+        className="font-scripture absolute inset-x-6 bottom-0 z-[1] flex h-[25%] flex-wrap content-end justify-start gap-x-2 gap-y-2 overflow-hidden pb-4 text-left text-xs leading-7 text-background/82 sm:pb-6 sm:text-sm lg:text-base"
+      >
+        {heroVerseTranslationSegments.map((segment) => (
+          <span
+            key={segment}
+            tabIndex={0}
+            data-hero-no-highlight
+            className="hero-verse-segment pointer-events-auto rounded-sm outline-none"
+          >
+            {segment}
+          </span>
+        ))}
+      </figcaption>
+    </>
+  );
+}
+
 function HeroSection({ copy }: LandingPageProps) {
   return (
-    <InteractiveHeroShell filterId="hero-goo-filter">
-      <div className="relative z-10 mx-auto flex min-h-[calc(100svh-8rem)] w-full max-w-7xl flex-col items-center justify-center text-center">
-        <div className="max-w-4xl">
+    <InteractiveHeroShell>
+      <HeroVerse />
+      <div className="pointer-events-none relative z-10 mx-auto flex min-h-[calc(100svh-8rem)] w-full max-w-7xl flex-col items-center justify-center text-center">
+        <div className="pointer-events-none max-w-4xl">
           <Image
             src="/images/logo.png"
             alt={copy.brand.name}
@@ -125,7 +192,7 @@ function HeroSection({ copy }: LandingPageProps) {
           </p>
           <div
             data-hero-no-highlight
-            className="mx-auto mt-8 flex w-fit flex-col justify-center gap-3 sm:flex-row"
+            className="pointer-events-auto mx-auto mt-8 flex w-fit flex-col justify-center gap-3 sm:flex-row"
           >
             <Button
               size="lg"
@@ -162,7 +229,7 @@ function HeroSection({ copy }: LandingPageProps) {
             {copy.hero.proofPoints.map((point) => (
               <li
                 key={point.id}
-                className="border-background/18 bg-background/10 text-background flex min-h-12 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-medium backdrop-blur"
+                className="border-background/18 bg-background/12 text-background flex min-h-12 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-medium shadow-soft"
               >
                 <Check aria-hidden="true" className="text-lime size-4" />
                 {point.label}
