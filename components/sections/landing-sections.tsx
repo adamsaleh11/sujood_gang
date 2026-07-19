@@ -38,30 +38,10 @@ type CommunityEvidence = {
 
 const communityEvidence: CommunityEvidence[] = [];
 const stepIcons = [CircleCheck, MailCheck, ShieldCheck] as const;
-const heroVerseArabicSegments = [
-  "ٱللَّهُ لَآ إِلَـٰهَ إِلَّا هُوَ",
-  "ٱلْحَىُّ ٱلْقَيُّومُ",
-  "لَا تَأْخُذُهُۥ سِنَةٌۭ وَلَا نَوْمٌۭ",
-  "لَّهُۥ مَا فِى ٱلسَّمَـٰوَٰتِ وَمَا فِى ٱلْأَرْضِ",
-  "مَن ذَا ٱلَّذِى يَشْفَعُ عِندَهُۥٓ إِلَّا بِإِذْنِهِۦ",
-  "يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ",
-  "وَلَا يُحِيطُونَ بِشَىْءٍۢ مِّنْ عِلْمِهِۦٓ إِلَّا بِمَا شَآءَ",
-  "وَسِعَ كُرْسِيُّهُ ٱلسَّمَـٰوَٰتِ وَٱلْأَرْضَ",
-  "وَلَا يَـُٔودُهُۥ حِفْظُهُمَا",
-  "وَهُوَ ٱلْعَلِىُّ ٱلْعَظِيمُ ٢٥٥",
-] as const;
-const heroVerseTranslationSegments = [
-  "Allah! There is no god worthy of worship except Him,",
-  "the Ever-Living, All-Sustaining.",
-  "Neither drowsiness nor sleep overtakes Him.",
-  "To Him belongs whatever is in the heavens and whatever is on the earth.",
-  "Who could possibly intercede with Him without His permission?",
-  "He fully knows what is ahead of them and what is behind them,",
-  "but no one can grasp any of His knowledge except what He wills to reveal.",
-  "His Seat encompasses the heavens and the earth,",
-  "and the preservation of both does not tire Him.",
-  "For He is the Most High, the Greatest.",
-] as const;
+const heroVerseArabic =
+  "ٱللَّهُ لَآ إِلَـٰهَ إِلَّا هُوَ ٱلْحَىُّ ٱلْقَيُّومُ ۚ لَا تَأْخُذُهُۥ سِنَةٌۭ وَلَا نَوْمٌۭ ۚ لَّهُۥ مَا فِى ٱلسَّمَـٰوَٰتِ وَمَا فِى ٱلْأَرْضِ ۗ مَن ذَا ٱلَّذِى يَشْفَعُ عِندَهُۥٓ إِلَّا بِإِذْنِهِۦ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَىْءٍۢ مِّنْ عِلْمِهِۦٓ إِلَّا بِمَا شَآءَ ۚ وَسِعَ كُرْسِيُّهُ ٱلسَّمَـٰوَٰتِ وَٱلْأَرْضَ ۖ وَلَا يَـُٔودُهُۥ حِفْظُهُمَا ۚ وَهُوَ ٱلْعَلِىُّ ٱلْعَظِيمُ ٢٥٥";
+const heroVerseTranslation =
+  "Allah! There is no god ˹worthy of worship˺ except Him, the Ever-Living, All-Sustaining. Neither drowsiness nor sleep overtakes Him. To Him belongs whatever is in the heavens and whatever is on the earth. Who could possibly intercede with Him without His permission? He ˹fully˺ knows what is ahead of them and what is behind them, but no one can grasp any of His knowledge—except what He wills ˹to reveal˺. His Seat encompasses the heavens and the earth, and the preservation of both does not tire Him. For He is the Most High, the Greatest.";
 
 function SectionCta({
   copy,
@@ -122,50 +102,40 @@ function SectionIntro({ copy, align = "left" }: SectionIntroProps) {
   );
 }
 
-function HeroVerse() {
+function HeroVerseArabic() {
   return (
-    <>
+    <figure className="pointer-events-auto relative z-[1] mx-auto max-w-7xl">
       <blockquote
         dir="rtl"
         lang="ar"
         aria-label="Ayat al-Kursi Arabic"
-        className="absolute inset-x-6 top-0 z-[1] flex h-[25%] flex-row flex-wrap content-start justify-start gap-x-3 gap-y-2 overflow-hidden pt-4 text-right text-xl leading-[2] text-background sm:pt-6 sm:text-2xl lg:text-3xl"
+        className="hero-verse-segment mx-auto max-w-6xl text-center text-sm leading-8 text-background/88 sm:text-base sm:leading-9 lg:text-lg lg:leading-10"
       >
-        {heroVerseArabicSegments.map((segment) => (
-          <span
-            key={segment}
-            tabIndex={0}
-            className="hero-verse-segment pointer-events-auto rounded-sm outline-none"
-          >
-            {segment}
-          </span>
-        ))}
+        {heroVerseArabic}
       </blockquote>
-      <figcaption
-        lang="en"
-        aria-label="Ayat al-Kursi English translation"
-        className="font-scripture absolute inset-x-6 bottom-0 z-[1] flex h-[25%] flex-wrap content-end justify-start gap-x-2 gap-y-2 overflow-hidden pb-4 text-left text-xs leading-7 text-background/82 sm:pb-6 sm:text-sm lg:text-base"
-      >
-        {heroVerseTranslationSegments.map((segment) => (
-          <span
-            key={segment}
-            tabIndex={0}
-            className="hero-verse-segment pointer-events-auto rounded-sm outline-none"
-          >
-            {segment}
-          </span>
-        ))}
-      </figcaption>
-    </>
+    </figure>
+  );
+}
+
+function HeroVerseTranslation() {
+  return (
+    <figcaption
+      lang="en"
+      aria-label="Ayat al-Kursi English translation"
+      className="font-scripture hero-verse-segment pointer-events-auto relative z-[1] mx-auto max-w-6xl text-center text-xs leading-6 text-background/78 sm:text-sm sm:leading-7 lg:text-[0.95rem] lg:leading-8"
+    >
+      {heroVerseTranslation}
+    </figcaption>
   );
 }
 
 function HeroSection({ copy }: LandingPageProps) {
   return (
     <InteractiveHeroShell>
-      <HeroVerse />
-      <div className="pointer-events-none relative z-10 mx-auto flex min-h-[calc(100svh-8rem)] w-full max-w-7xl flex-col items-center justify-center text-center">
-        <div className="pointer-events-none max-w-4xl">
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col gap-3 text-center">
+        <HeroVerseArabic />
+        <div className="pointer-events-none mx-auto flex w-full max-w-7xl flex-col items-center justify-center text-center">
+          <div className="pointer-events-none max-w-4xl">
           <Image
             src="/images/logo.png"
             alt={copy.brand.name}
@@ -231,7 +201,9 @@ function HeroSection({ copy }: LandingPageProps) {
               </li>
             ))}
           </ul>
+          </div>
         </div>
+        <HeroVerseTranslation />
       </div>
     </InteractiveHeroShell>
   );
