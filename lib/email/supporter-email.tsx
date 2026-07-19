@@ -184,7 +184,7 @@ const styles = {
     maxWidth: "560px",
     margin: "0 auto",
     padding: "32px 24px",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#faf7ee",
   },
   brand: {
     fontSize: "14px",

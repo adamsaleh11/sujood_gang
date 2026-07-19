@@ -38,6 +38,10 @@ type CommunityEvidence = {
 
 const communityEvidence: CommunityEvidence[] = [];
 const stepIcons = [CircleCheck, MailCheck, ShieldCheck] as const;
+const heroVerseArabic =
+  "ٱللَّهُ لَآ إِلَـٰهَ إِلَّا هُوَ ٱلْحَىُّ ٱلْقَيُّومُ ۚ لَا تَأْخُذُهُۥ سِنَةٌۭ وَلَا نَوْمٌۭ ۚ لَّهُۥ مَا فِى ٱلسَّمَـٰوَٰتِ وَمَا فِى ٱلْأَرْضِ ۗ مَن ذَا ٱلَّذِى يَشْفَعُ عِندَهُۥٓ إِلَّا بِإِذْنِهِۦ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَىْءٍۢ مِّنْ عِلْمِهِۦٓ إِلَّا بِمَا شَآءَ ۚ وَسِعَ كُرْسِيُّهُ ٱلسَّمَـٰوَٰتِ وَٱلْأَرْضَ ۖ وَلَا يَـُٔودُهُۥ حِفْظُهُمَا ۚ وَهُوَ ٱلْعَلِىُّ ٱلْعَظِيمُ ٢٥٥";
+const heroVerseTranslation =
+  "Allah! There is no god ˹worthy of worship˺ except Him, the Ever-Living, All-Sustaining. Neither drowsiness nor sleep overtakes Him. To Him belongs whatever is in the heavens and whatever is on the earth. Who could possibly intercede with Him without His permission? He ˹fully˺ knows what is ahead of them and what is behind them, but no one can grasp any of His knowledge—except what He wills ˹to reveal˺. His Seat encompasses the heavens and the earth, and the preservation of both does not tire Him. For He is the Most High, the Greatest.";
 
 function SectionCta({
   copy,
@@ -98,78 +102,106 @@ function SectionIntro({ copy, align = "left" }: SectionIntroProps) {
   );
 }
 
+function HeroVerseArabic() {
+  return (
+    <figure className="pointer-events-auto relative z-[1] mx-auto max-w-7xl">
+      <blockquote
+        dir="rtl"
+        lang="ar"
+        aria-label="Ayat al-Kursi Arabic"
+        className="hero-verse-segment text-background/88 mx-auto max-w-6xl text-center text-sm leading-8 sm:text-base sm:leading-9 lg:text-lg lg:leading-10"
+      >
+        {heroVerseArabic}
+      </blockquote>
+    </figure>
+  );
+}
+
+function HeroVerseTranslation() {
+  return (
+    <figcaption
+      lang="en"
+      aria-label="Ayat al-Kursi English translation"
+      className="font-scripture hero-verse-segment text-background/78 pointer-events-auto relative z-[1] mx-auto max-w-6xl text-center text-xs leading-6 sm:text-sm sm:leading-7 lg:text-[0.95rem] lg:leading-8"
+    >
+      {heroVerseTranslation}
+    </figcaption>
+  );
+}
+
 function HeroSection({ copy }: LandingPageProps) {
   return (
-    <InteractiveHeroShell filterId="hero-goo-filter">
-      <div className="relative z-10 mx-auto flex min-h-[calc(100svh-8rem)] w-full max-w-7xl flex-col items-center justify-center text-center">
-        <div className="max-w-4xl">
-          <Image
-            src="/images/logo.png"
-            alt={copy.brand.name}
-            width={88}
-            height={88}
-            priority
-            className="shadow-soft mx-auto mb-6 rounded-full"
-          />
-          <Badge className="bg-lime text-lime-foreground mb-6">
-            {copy.hero.badgeLabel}
-          </Badge>
-          <p className="text-lime mx-auto mb-5 max-w-2xl text-sm font-medium uppercase">
-            {copy.hero.mission}
-          </p>
-          <h1 className="text-display mx-auto max-w-4xl">
-            {copy.hero.headline}
-          </h1>
-          <p className="text-background/78 mx-auto mt-6 max-w-2xl text-lg leading-8 sm:text-xl">
-            {copy.hero.supportingLine}
-          </p>
-          <div
-            data-hero-no-highlight
-            className="mx-auto mt-8 flex w-fit flex-col justify-center gap-3 sm:flex-row"
-          >
-            <Button
-              size="lg"
-              nativeButton={false}
-              render={
-                <TrackedLink
-                  href={copy.hero.primaryCta.href}
-                  eventName="primary_cta_clicked"
-                  eventProperties={{ placement: "hero" }}
-                />
-              }
-              className="bg-lime text-lime-foreground hover:bg-lime/90 min-h-12 px-5"
-            >
-              {copy.hero.primaryCta.label}
-              <ArrowRight aria-hidden="true" />
-            </Button>
-            <Button
-              size="lg"
-              nativeButton={false}
-              render={
-                <TrackedLink
-                  href={copy.hero.secondaryCta.href}
-                  eventName="secondary_cta_clicked"
-                  eventProperties={{ placement: "hero" }}
-                />
-              }
-              className="bg-lime text-lime-foreground hover:bg-lime/90 min-h-12 px-5"
-            >
-              {copy.hero.secondaryCta.label}
-              <PlayCircle aria-hidden="true" />
-            </Button>
-          </div>
-          <ul className="mx-auto mt-8 grid max-w-3xl gap-3 sm:grid-cols-3">
-            {copy.hero.proofPoints.map((point) => (
-              <li
-                key={point.id}
-                className="border-background/18 bg-background/10 text-background flex min-h-12 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-medium backdrop-blur"
+    <InteractiveHeroShell>
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col gap-3 text-center">
+        <HeroVerseArabic />
+        <div className="pointer-events-none mx-auto flex w-full max-w-7xl flex-col items-center justify-center text-center">
+          <div className="pointer-events-none max-w-4xl">
+            <Image
+              src="/images/logo.png"
+              alt={copy.brand.name}
+              width={88}
+              height={88}
+              priority
+              className="shadow-soft mx-auto mb-6 rounded-full"
+            />
+            <Badge className="bg-lime text-lime-foreground mb-6">
+              {copy.hero.badgeLabel}
+            </Badge>
+            <p className="text-lime mx-auto mb-5 max-w-2xl text-sm font-medium uppercase">
+              {copy.hero.mission}
+            </p>
+            <h1 className="text-display mx-auto max-w-4xl">
+              {copy.hero.headline}
+            </h1>
+            <p className="text-background/78 mx-auto mt-6 max-w-2xl text-lg leading-8 sm:text-xl">
+              {copy.hero.supportingLine}
+            </p>
+            <div className="pointer-events-auto mx-auto mt-8 flex w-fit flex-col justify-center gap-3 sm:flex-row">
+              <Button
+                size="lg"
+                nativeButton={false}
+                render={
+                  <TrackedLink
+                    href={copy.hero.primaryCta.href}
+                    eventName="primary_cta_clicked"
+                    eventProperties={{ placement: "hero" }}
+                  />
+                }
+                className="bg-lime text-lime-foreground hover:bg-lime/90 min-h-12 px-5"
               >
-                <Check aria-hidden="true" className="text-lime size-4" />
-                {point.label}
-              </li>
-            ))}
-          </ul>
+                {copy.hero.primaryCta.label}
+                <ArrowRight aria-hidden="true" />
+              </Button>
+              <Button
+                size="lg"
+                nativeButton={false}
+                render={
+                  <TrackedLink
+                    href={copy.hero.secondaryCta.href}
+                    eventName="secondary_cta_clicked"
+                    eventProperties={{ placement: "hero" }}
+                  />
+                }
+                className="bg-lime text-lime-foreground hover:bg-lime/90 min-h-12 px-5"
+              >
+                {copy.hero.secondaryCta.label}
+                <PlayCircle aria-hidden="true" />
+              </Button>
+            </div>
+            <ul className="mx-auto mt-8 grid max-w-3xl gap-3 sm:grid-cols-3">
+              {copy.hero.proofPoints.map((point) => (
+                <li
+                  key={point.id}
+                  className="border-background/18 bg-background/12 text-background shadow-soft flex min-h-12 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-medium"
+                >
+                  <Check aria-hidden="true" className="text-lime size-4" />
+                  {point.label}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
+        <HeroVerseTranslation />
       </div>
     </InteractiveHeroShell>
   );
