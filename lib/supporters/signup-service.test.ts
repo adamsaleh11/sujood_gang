@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   createSupporterSignupService,
+  hashToken,
   type CreateSupporterInput,
 } from "./signup-service";
 import { createInMemorySupporterStore } from "./test-store";
@@ -16,6 +17,8 @@ const baseInput = {
   consent: true,
 } satisfies CreateSupporterInput;
 
+const tokenSecret = "test-token-secret-test-token-secret";
+
 function service() {
   const store = createInMemorySupporterStore();
   const sent: string[] = [];
@@ -27,6 +30,7 @@ function service() {
     },
     now: () => new Date("2026-07-19T12:00:00.000Z"),
     randomBytes: (size) => Buffer.alloc(size, 7),
+    tokenSecret,
   });
 
   return { signup, store, sent };
@@ -40,12 +44,19 @@ function rateLimitedService() {
     sendConfirmationEmail: async () => {},
     now: () => new Date("2026-07-19T12:00:00.000Z"),
     randomBytes: (size) => Buffer.alloc(size, 7),
+    tokenSecret,
   });
 
   return { signup, store };
 }
 
 describe("createSupporterSignupService", () => {
+  it("uses the token secret when hashing verification tokens", () => {
+    expect(hashToken("same-token", "a".repeat(32))).not.toBe(
+      hashToken("same-token", "b".repeat(32)),
+    );
+  });
+
   it("is idempotent by normalized email without creating duplicate rows", async () => {
     const { signup, store, sent } = service();
 
@@ -87,6 +98,31 @@ describe("createSupporterSignupService", () => {
     expect(store.supporters).toHaveLength(0);
   });
 
+  it("does not mark verification as sent when the confirmation email fails", async () => {
+    const store = createInMemorySupporterStore();
+    const signup = createSupporterSignupService({
+      store,
+      rateLimit: async () => ({ allowed: true }),
+      sendConfirmationEmail: async () => {
+        throw new Error("provider unavailable");
+      },
+      now: () => new Date("2026-07-19T12:00:00.000Z"),
+      randomBytes: (size) => Buffer.alloc(size, 7),
+      tokenSecret,
+    });
+
+    await expect(
+      signup.createSupporter(baseInput, { ip: "203.0.113.12" }),
+    ).resolves.toEqual({ state: "email_send_failed" });
+
+    expect(store.supporters).toHaveLength(1);
+    expect(store.supporters[0]).toMatchObject({
+      email_normalized: "amara@example.com",
+      status: "pending",
+    });
+    expect(store.supporters[0]?.verification_sent_at).toBeUndefined();
+  });
+
   it("resending verification invalidates prior unused tokens", async () => {
     const { signup, store, sent } = service();
 
@@ -101,6 +137,31 @@ describe("createSupporterSignupService", () => {
     );
     expect(store.tokens[1]?.used_at).toBeNull();
     expect(sent).toEqual(["amara@example.com", "amara@example.com"]);
+  });
+
+  it("rate limits resending verification to three issued tokens per day for the email", async () => {
+    const { signup, store, sent } = service();
+
+    await signup.createSupporter(baseInput, { ip: "203.0.113.13" });
+    await signup.resendVerification("amara@example.com", {
+      ip: "203.0.113.13",
+    });
+    await signup.resendVerification("amara@example.com", {
+      ip: "203.0.113.13",
+    });
+
+    await expect(
+      signup.resendVerification("amara@example.com", { ip: "203.0.113.13" }),
+    ).resolves.toEqual({
+      state: "rate_limited",
+      retryAfterSeconds: 86400,
+    });
+    expect(store.tokens).toHaveLength(3);
+    expect(sent).toEqual([
+      "amara@example.com",
+      "amara@example.com",
+      "amara@example.com",
+    ]);
   });
 
   it("stores campaign attribution separately from referral attribution", async () => {

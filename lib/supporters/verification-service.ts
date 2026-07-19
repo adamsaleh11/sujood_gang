@@ -17,6 +17,7 @@ export type VerificationServiceDependencies = {
   }) => Promise<void>;
   now?: () => Date;
   randomBytes?: (size: number) => Buffer;
+  tokenSecret: string;
 };
 
 export function createSupporterVerificationService({
@@ -24,12 +25,13 @@ export function createSupporterVerificationService({
   sendWelcomeEmail = async () => {},
   now = () => new Date(),
   randomBytes = nodeRandomBytes,
+  tokenSecret,
 }: VerificationServiceDependencies) {
   return {
     async verifySupporter(rawToken: string): Promise<VerifySupporterResult> {
       if (!rawToken) return { state: "invalid" };
       const token = await store.findVerificationTokenByHash?.(
-        hashToken(rawToken),
+        hashToken(rawToken, tokenSecret),
       );
       if (!token) return { state: "invalid" };
 
@@ -57,11 +59,14 @@ export function createSupporterVerificationService({
       });
       if (!verified) return { state: "invalid" };
 
-      await sendWelcomeEmail({
-        to: verified.email_normalized,
-        referralCode: verified.personal_referral_code ?? generatedCode,
-        supporterId: verified.id,
-      });
+      const suppressed = (await store.isSuppressed?.(verified.id)) ?? false;
+      if (!suppressed) {
+        await sendWelcomeEmail({
+          to: verified.email_normalized,
+          referralCode: verified.personal_referral_code ?? generatedCode,
+          supporterId: verified.id,
+        });
+      }
 
       return {
         state: "success",

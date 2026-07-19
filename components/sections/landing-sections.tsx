@@ -1,10 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Check, Mail, Package, PlayCircle } from "lucide-react";
+import { ArrowRight, Check, Package, PlayCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { SupporterSignupForm } from "@/components/forms/supporter-signup-form";
 import { FaqAccordion } from "@/components/sections/faq-accordion";
 import type { EditorialSectionCopy, SiteCopy } from "@/lib/content/copy";
+import { COUNTRY_CODES } from "@/lib/validation/countries";
 
 type LandingPageProps = {
   copy: SiteCopy;
@@ -24,6 +26,39 @@ type CommunityEvidence = {
 };
 
 const communityEvidence: CommunityEvidence[] = [];
+
+function SectionCta({
+  copy,
+  align = "left",
+  surface = "light",
+}: LandingPageProps & {
+  align?: "left" | "center";
+  surface?: "light" | "dark";
+}) {
+  return (
+    <div
+      className={
+        align === "center"
+          ? "mt-8 flex justify-center"
+          : "mt-8 flex justify-start"
+      }
+    >
+      <Button
+        size="lg"
+        nativeButton={false}
+        render={<Link href={copy.hero.primaryCta.href} />}
+        className={
+          surface === "dark"
+            ? "bg-lime text-lime-foreground hover:bg-lime/90 min-h-12 px-5"
+            : "min-h-12 px-5"
+        }
+      >
+        {copy.hero.primaryCta.label}
+        <ArrowRight aria-hidden="true" />
+      </Button>
+    </div>
+  );
+}
 
 function SectionIntro({ copy, align = "left" }: SectionIntroProps) {
   return (
@@ -141,7 +176,10 @@ function StorySection({ copy }: LandingPageProps) {
             {copy.brand.tagline}
           </p>
         </div>
-        <SectionIntro copy={copy.strengthThroughSubmission} />
+        <div>
+          <SectionIntro copy={copy.strengthThroughSubmission} />
+          <SectionCta copy={copy} />
+        </div>
       </div>
     </section>
   );
@@ -162,6 +200,7 @@ function VisionSection({ copy }: LandingPageProps) {
           <p className="text-background/76 mt-5 max-w-3xl text-base leading-8 sm:text-lg">
             {copy.vision.body}
           </p>
+          <SectionCta copy={copy} surface="dark" />
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
           {copy.memberBenefits.slice(0, 2).map((benefit) => (
@@ -186,7 +225,9 @@ function BenefitsSection({ copy }: LandingPageProps) {
   return (
     <section className="py-section px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <SectionIntro copy={copy.memberBenefitsIntro} align="center" />
+        <SectionCta copy={copy} align="center" />
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {copy.memberBenefits.map((benefit) => (
             <article
               key={benefit.id}
@@ -252,6 +293,7 @@ function CommunitySection({ copy }: LandingPageProps) {
     >
       <div className="mx-auto max-w-7xl">
         <SectionIntro copy={copy.community} align="center" />
+        <SectionCta copy={copy} align="center" />
         <CommunityEvidenceGrid evidence={communityEvidence} />
       </div>
     </section>
@@ -285,14 +327,26 @@ function MerchandiseSection({ copy }: LandingPageProps) {
         </div>
         <div>
           <SectionIntro copy={copy.merchandise} />
-          <Button
-            nativeButton={false}
-            render={<Link href={copy.merchandise.notifyCta.href} />}
-            className="mt-8 min-h-12 px-5"
-          >
-            {copy.merchandise.notifyCta.label}
-            <ArrowRight aria-hidden="true" />
-          </Button>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <Button
+              size="lg"
+              nativeButton={false}
+              render={<Link href={copy.hero.primaryCta.href} />}
+              className="min-h-12 px-5"
+            >
+              {copy.hero.primaryCta.label}
+              <ArrowRight aria-hidden="true" />
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              nativeButton={false}
+              render={<Link href={copy.merchandise.notifyCta.href} />}
+              className="min-h-12 px-5"
+            >
+              {copy.merchandise.notifyCta.label}
+            </Button>
+          </div>
         </div>
       </div>
     </section>
@@ -313,14 +367,16 @@ function JoinSection({ copy }: LandingPageProps) {
           </p>
         </div>
         <div className="border-border bg-secondary/70 rounded-lg border p-5 sm:p-6">
-          <Mail aria-hidden="true" className="text-primary mb-5 size-6" />
           <p className="text-lg font-semibold">{copy.join.formIntro}</p>
           <p className="text-muted-foreground mt-4 leading-7">
             {copy.join.confirmationExpectation}
           </p>
-          <Button className="mt-6 min-h-12 px-5" disabled>
-            {copy.join.submitLabel}
-          </Button>
+          <div className="mt-6">
+            <SupporterSignupForm
+              copy={copy.join.form}
+              countryCodes={COUNTRY_CODES}
+            />
+          </div>
         </div>
       </div>
     </section>
@@ -340,6 +396,7 @@ function FaqSection({ copy }: LandingPageProps) {
             {copy.accessibility.faqRegion}
           </p>
           <h2 className="text-display-sm">{copy.accessibility.faqRegion}</h2>
+          <SectionCta copy={copy} />
         </div>
         <FaqAccordion faqs={copy.faq} />
       </div>

@@ -26,6 +26,7 @@ export async function createSupporter(input: CreateSupporterInput | FormData) {
     }),
     sendConfirmationEmail,
     tokenTtlHours: env.VERIFICATION_TOKEN_TTL_HOURS,
+    tokenSecret: env.EMAIL_TOKEN_SECRET,
   });
 
   return service.createSupporter(parseCreateInput(input), {
@@ -43,6 +44,7 @@ export async function resendVerification(email: string) {
     }),
     sendConfirmationEmail,
     tokenTtlHours: env.VERIFICATION_TOKEN_TTL_HOURS,
+    tokenSecret: env.EMAIL_TOKEN_SECRET,
   });
 
   return service.resendVerification(email, { ip: await requestIp() });
@@ -53,6 +55,7 @@ export async function verifySupporter(rawToken: string) {
   const service = createSupporterVerificationService({
     store: createSupabaseSupporterStore(supabase),
     sendWelcomeEmail,
+    tokenSecret: env.EMAIL_TOKEN_SECRET,
   });
 
   return service.verifySupporter(rawToken);

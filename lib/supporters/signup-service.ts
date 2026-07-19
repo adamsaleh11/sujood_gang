@@ -1,4 +1,4 @@
-import { createHash, randomBytes as nodeRandomBytes } from "node:crypto";
+import { createHmac, randomBytes as nodeRandomBytes } from "node:crypto";
 import {
   CONSENT_VERSION,
   signupSchema,
@@ -29,6 +29,10 @@ export type SupporterRecord = {
   consent_version?: string;
   consent_at?: Date;
   verification_sent_at?: Date;
+  verified_at?: Date;
+  unsubscribed_at?: Date;
+  suppressed_at?: Date;
+  suppression_reason?: "hard_bounce" | "complained";
 };
 
 export type VerificationTokenRecord = {
@@ -37,6 +41,18 @@ export type VerificationTokenRecord = {
   token_hash: string;
   expires_at: Date;
   used_at: Date | null;
+  created_at: Date;
+};
+
+export type EmailEventRecord = {
+  id: string;
+  supporter_id: string | null;
+  type: "delivered" | "bounced" | "complained" | "failed";
+  provider_event_id?: string;
+  provider_message_id?: string;
+  email_normalized?: string;
+  provider_payload?: unknown;
+  created_at: Date;
 };
 
 export type AttributionInput = {
@@ -70,7 +86,6 @@ export type SupporterStore = {
     referrer?: string;
     consent_version: string;
     consent_at: Date;
-    verification_sent_at: Date;
   }): Promise<SupporterRecord>;
   findVerifiedSupporterByReferralCode(
     code: string,
@@ -80,6 +95,33 @@ export type SupporterStore = {
     token_hash: string;
     expires_at: Date;
     now: Date;
+  }): Promise<void>;
+  markVerificationSent?(params: {
+    supporter_id: string;
+    verification_sent_at: Date;
+  }): Promise<void>;
+  countVerificationTokensSince?(
+    supporterId: string,
+    since: Date,
+  ): Promise<number>;
+  unsubscribeSupporter?(params: {
+    supporter_id: string;
+    unsubscribed_at: Date;
+  }): Promise<void>;
+  suppressSupporter?(params: {
+    supporter_id: string;
+    suppressed_at: Date;
+    suppression_reason: "hard_bounce" | "complained";
+  }): Promise<void>;
+  isSuppressed?(supporterId: string): Promise<boolean>;
+  recordEmailEvent?(row: {
+    supporter_id: string | null;
+    type: EmailEventRecord["type"];
+    provider_event_id?: string;
+    provider_message_id?: string;
+    email_normalized?: string;
+    provider_payload?: unknown;
+    created_at: Date;
   }): Promise<void>;
   findVerificationTokenByHash?(
     tokenHash: string,
@@ -97,6 +139,7 @@ export type CreateSupporterResult =
   | { state: "accepted" }
   | { state: "already_verified" }
   | { state: "created" }
+  | { state: "email_send_failed" }
   | { state: "pending" }
   | { state: "rate_limited"; retryAfterSeconds?: number }
   | { state: "validation_error" };
@@ -104,6 +147,7 @@ export type CreateSupporterResult =
 export type ResendVerificationResult =
   | { state: "accepted" }
   | { state: "already_verified" }
+  | { state: "email_send_failed" }
   | { state: "pending" }
   | { state: "rate_limited"; retryAfterSeconds?: number }
   | { state: "validation_error" };
@@ -124,6 +168,7 @@ export type SignupServiceDependencies = {
   now?: () => Date;
   randomBytes?: (size: number) => Buffer;
   tokenTtlHours?: number;
+  tokenSecret: string;
 };
 
 export type CreateSupporterContext = {
@@ -143,6 +188,7 @@ export function createSupporterSignupService({
   now = () => new Date(),
   randomBytes = nodeRandomBytes,
   tokenTtlHours = 48,
+  tokenSecret,
 }: SignupServiceDependencies) {
   return {
     async createSupporter(
@@ -195,16 +241,17 @@ export function createSupporterSignupService({
         ...normalizeAttribution(input.attribution),
         consent_version: CONSENT_VERSION,
         consent_at: timestamp,
-        verification_sent_at: timestamp,
       });
-      await issueAndSendVerification({
+      const sent = await issueAndSendVerification({
         store,
         sendConfirmationEmail,
         randomBytes,
         supporter,
         timestamp,
         tokenTtlHours,
+        tokenSecret,
       });
+      if (!sent) return { state: "email_send_failed" };
 
       return { state: "created" };
     },
@@ -229,22 +276,33 @@ export function createSupporterSignupService({
       if (supporter.status === "verified") {
         return { state: "already_verified" };
       }
+      const timestamp = now();
+      const issuedCount =
+        (await store.countVerificationTokensSince?.(
+          supporter.id,
+          new Date(timestamp.getTime() - 24 * 60 * 60 * 1000),
+        )) ?? 0;
+      if (issuedCount >= 3) {
+        return { state: "rate_limited", retryAfterSeconds: 86400 };
+      }
 
-      await issueAndSendVerification({
+      const sent = await issueAndSendVerification({
         store,
         sendConfirmationEmail,
         randomBytes,
         supporter,
-        timestamp: now(),
+        timestamp,
         tokenTtlHours,
+        tokenSecret,
       });
+      if (!sent) return { state: "email_send_failed" };
       return { state: "pending" };
     },
   };
 }
 
-export function hashToken(rawToken: string): string {
-  return createHash("sha256").update(rawToken).digest("hex");
+export function hashToken(rawToken: string, tokenSecret: string): string {
+  return createHmac("sha256", tokenSecret).update(rawToken).digest("hex");
 }
 
 export function createRawToken(randomBytes: (size: number) => Buffer): string {
@@ -262,6 +320,7 @@ async function issueAndSendVerification({
   supporter,
   timestamp,
   tokenTtlHours,
+  tokenSecret,
 }: {
   store: SupporterStore;
   sendConfirmationEmail: SignupServiceDependencies["sendConfirmationEmail"];
@@ -269,19 +328,33 @@ async function issueAndSendVerification({
   supporter: SupporterRecord;
   timestamp: Date;
   tokenTtlHours: number;
-}) {
+  tokenSecret: string;
+}): Promise<boolean> {
   const token = createRawToken(randomBytes);
   await store.issueVerificationToken({
     supporter_id: supporter.id,
-    token_hash: hashToken(token),
+    token_hash: hashToken(token, tokenSecret),
     expires_at: addHours(timestamp, tokenTtlHours),
     now: timestamp,
   });
-  await sendConfirmationEmail({
-    to: supporter.email_normalized,
-    token,
-    supporterId: supporter.id,
+  try {
+    await sendConfirmationEmail({
+      to: supporter.email_normalized,
+      token,
+      supporterId: supporter.id,
+    });
+  } catch (error) {
+    console.error("Confirmation email failed", {
+      supporterId: supporter.id,
+      error,
+    });
+    return false;
+  }
+  await store.markVerificationSent?.({
+    supporter_id: supporter.id,
+    verification_sent_at: timestamp,
   });
+  return true;
 }
 
 function normalizeAttribution(attribution?: AttributionInput) {

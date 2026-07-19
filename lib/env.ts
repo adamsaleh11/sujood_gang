@@ -11,6 +11,7 @@ export const env = createEnv({
     SUPABASE_URL: z.url(),
     SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
     RESEND_API_KEY: z.string().min(1),
+    RESEND_WEBHOOK_SECRET: z.string().min(1).optional(),
     EMAIL_FROM: z.string().min(1),
     EMAIL_TOKEN_SECRET: z.string().min(32),
     VERIFICATION_TOKEN_TTL_HOURS: z.coerce
@@ -33,6 +34,7 @@ export const env = createEnv({
     SUPABASE_URL: process.env.SUPABASE_URL,
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
+    RESEND_WEBHOOK_SECRET: process.env.RESEND_WEBHOOK_SECRET,
     EMAIL_FROM: process.env.EMAIL_FROM,
     EMAIL_TOKEN_SECRET: process.env.EMAIL_TOKEN_SECRET,
     VERIFICATION_TOKEN_TTL_HOURS: process.env.VERIFICATION_TOKEN_TTL_HOURS,
