@@ -10,12 +10,14 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { TrackedLink } from "@/components/analytics/tracked-link";
+import { SupporterSignupForm } from "@/components/forms/supporter-signup-form";
 import { FunnelPageTracker } from "@/components/analytics/funnel-page-tracker";
 import { InteractiveHeroShell } from "@/components/sections/interactive-hero-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FaqAccordion } from "@/components/sections/faq-accordion";
 import type { EditorialSectionCopy, SiteCopy } from "@/lib/content/copy";
+import { COUNTRY_CODES } from "@/lib/validation/countries";
 
 type LandingPageProps = {
   copy: SiteCopy;
@@ -189,7 +191,10 @@ function StorySection({ copy }: LandingPageProps) {
             {copy.brand.tagline}
           </p>
         </div>
-        <SectionIntro copy={copy.strengthThroughSubmission} />
+        <div>
+          <SectionIntro copy={copy.strengthThroughSubmission} />
+          <SectionCta copy={copy} />
+        </div>
       </div>
     </section>
   );
@@ -210,6 +215,7 @@ function VisionSection({ copy }: LandingPageProps) {
           <p className="text-background/76 mt-5 max-w-3xl text-base leading-8 sm:text-lg">
             {copy.vision.body}
           </p>
+          <SectionCta copy={copy} surface="dark" />
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
           {copy.memberBenefits.slice(0, 2).map((benefit) => (
@@ -453,9 +459,12 @@ function JoinSection({ copy }: LandingPageProps) {
           <p className="text-muted-foreground mt-4 leading-7">
             {copy.join.confirmationExpectation}
           </p>
-          <Button className="mt-6 min-h-12 px-5" disabled>
-            {copy.join.submitLabel}
-          </Button>
+          <div className="mt-6">
+            <SupporterSignupForm
+              copy={copy.join.form}
+              countryCodes={COUNTRY_CODES}
+            />
+          </div>
         </div>
       </div>
     </section>
