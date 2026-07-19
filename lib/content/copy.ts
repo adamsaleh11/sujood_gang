@@ -25,6 +25,56 @@ type FaqCopy = {
   answer: string;
 };
 
+type SignupFormCopy = {
+  fieldGroups: {
+    requiredLegend: string;
+    optionalLegend: string;
+  };
+  labels: {
+    name: string;
+    email: string;
+    countryCode: string;
+    city: string;
+    instagram: string;
+    referralCode: string;
+    heardAbout: string;
+    consent: string;
+  };
+  helpers: {
+    name: string;
+    email: string;
+    countryCode: string;
+    city: string;
+    instagram: string;
+    referralCode: string;
+    heardAbout: string;
+    consent: string;
+  };
+  placeholders: {
+    name: string;
+    email: string;
+    countryCode: string;
+    city: string;
+    instagram: string;
+    referralCode: string;
+    heardAbout: string;
+  };
+  honeypotLabel: string;
+  countryDefaultOption: string;
+  submitLabel: string;
+  pendingLabel: string;
+  statusLabels: {
+    created: string;
+    pending: string;
+    alreadyVerified: string;
+    accepted: string;
+    rateLimited: string;
+    validationError: string;
+    emailSendFailed: string;
+    unexpectedError: string;
+  };
+};
+
 type EmailCopy = {
   subject: string;
   preview: string;
@@ -68,6 +118,10 @@ type SiteCopy = {
     mission: string;
     headline: string;
     supportingLine: string;
+    proofPoints: {
+      id: string;
+      label: string;
+    }[];
     primaryCta: CtaCopy;
     secondaryCta: CtaCopy;
     posterAlt: string;
@@ -85,6 +139,14 @@ type SiteCopy = {
   };
   strengthThroughSubmission: EditorialSectionCopy;
   vision: EditorialSectionCopy;
+  supporterPath: EditorialSectionCopy & {
+    steps: {
+      id: string;
+      title: string;
+      body: string;
+    }[];
+  };
+  memberBenefitsIntro: EditorialSectionCopy;
   community: EditorialSectionCopy & {
     emptyStateLabel: string;
   };
@@ -108,6 +170,7 @@ type SiteCopy = {
     successTitle: string;
     successBody: string;
     confirmationExpectation: string;
+    form: SignupFormCopy;
   };
   faq: FaqCopy[];
   footer: {
@@ -207,22 +270,22 @@ export const siteCopy = {
       {
         id: "mission", // DRAFT(ai)
         label: "Mission", // DRAFT(ai)
-        href: "#mission", // DRAFT(ai)
+        href: "/#mission", // DRAFT(ai)
       },
       {
         id: "community", // DRAFT(ai)
         label: "Community", // DRAFT(ai)
-        href: "#community", // DRAFT(ai)
+        href: "/#community", // DRAFT(ai)
       },
       {
         id: "merchandise", // DRAFT(ai)
         label: "Merchandise", // DRAFT(ai)
-        href: "#merchandise", // DRAFT(ai)
+        href: "/#merchandise", // DRAFT(ai)
       },
       {
         id: "faq", // DRAFT(ai)
         label: "FAQ", // DRAFT(ai)
-        href: "#faq", // DRAFT(ai)
+        href: "/#faq", // DRAFT(ai)
       },
     ],
   },
@@ -247,13 +310,27 @@ export const siteCopy = {
     headline: "Strength Through Submission", // DRAFT(ai)
     supportingLine:
       "Join Sujood Gang as a free supporter and take part in a community vision shaped by humility, presence, and shared intention.", // DRAFT(ai)
+    proofPoints: [
+      {
+        id: "free",
+        label: "Free to join",
+      },
+      {
+        id: "verification",
+        label: "Email confirmation required",
+      },
+      {
+        id: "updates",
+        label: "Measured project updates",
+      },
+    ],
     primaryCta: {
       label: "Join as a supporter", // DRAFT(ai)
-      href: "#join", // DRAFT(ai)
+      href: "/#join", // DRAFT(ai)
     },
     secondaryCta: {
       label: "Explore the vision", // DRAFT(ai)
-      href: "#vision", // DRAFT(ai)
+      href: "/#vision", // DRAFT(ai)
     },
     posterAlt: "Editorial placeholder for the Sujood Gang mission video.", // DRAFT(ai)
     video: {
@@ -284,6 +361,33 @@ export const siteCopy = {
     title: "A global community, built with restraint", // DRAFT(ai)
     body: "The vision is to build the world's largest community united by sujood: a visible network of supporters connected by belonging rather than noise. It starts with a free signup, a confirmed email, and a shared sense that this identity can travel across countries and cities without losing its center. Scale matters only if it remains human. Sujood Gang should feel global in ambition and personal in tone.", // DRAFT(ai)
   },
+  supporterPath: {
+    eyebrow: "How joining works", // DRAFT(ai)
+    title: "A simple path from interest to confirmed support", // DRAFT(ai)
+    body: "The supporter flow is intentionally light: share the details needed to create your record, confirm your email, then receive updates only as the project has something real to say.", // DRAFT(ai)
+    steps: [
+      {
+        id: "join-free", // DRAFT(ai)
+        title: "Join free", // DRAFT(ai)
+        body: "Add your name, email, country, city, and optional context so the project can understand where support is forming.", // DRAFT(ai)
+      },
+      {
+        id: "confirm-email", // DRAFT(ai)
+        title: "Confirm your email", // DRAFT(ai)
+        body: "Open the verification link from your inbox. Until then, the signup remains pending.", // DRAFT(ai)
+      },
+      {
+        id: "stay-close", // DRAFT(ai)
+        title: "Stay close to the build", // DRAFT(ai)
+        body: "Verified supporters can receive measured updates, future merch notifications, and referral features when they are ready.", // DRAFT(ai)
+      },
+    ],
+  },
+  memberBenefitsIntro: {
+    eyebrow: "What members receive", // DRAFT(ai)
+    title: "A supporter path with clear expectations", // DRAFT(ai)
+    body: "The first version keeps the promise simple: supporters join for free, confirm their email, and receive only the benefits the project can honestly stand behind today.", // DRAFT(ai)
+  },
   community: {
     eyebrow: "Community", // DRAFT(ai)
     title: "Real support, shown only when it is real", // DRAFT(ai)
@@ -296,7 +400,7 @@ export const siteCopy = {
     body: "Merchandise is treated as part of the identity, not as proof of momentum. The first pieces should feel considered, useful, and aligned with the posture behind the name. Supporters can be notified when confirmed releases are ready.", // DRAFT(ai)
     notifyCta: {
       label: "Notify me about merch", // DRAFT(ai)
-      href: "#join", // DRAFT(ai)
+      href: "/#join", // DRAFT(ai)
     },
     imageAlt: "Minimal upcoming merchandise layout for Sujood Gang.", // DRAFT(ai)
     upcomingLabel: "Upcoming", // DRAFT(ai)
@@ -352,6 +456,60 @@ export const siteCopy = {
       "We sent a confirmation email. Once you confirm, you will be added to the supporter list and receive occasional updates.", // DRAFT(ai)
     confirmationExpectation:
       "If the email does not arrive, check spam or promotions before trying again.", // DRAFT(ai)
+    form: {
+      fieldGroups: {
+        requiredLegend: "Required details", // DRAFT(ai)
+        optionalLegend: "Optional context", // DRAFT(ai)
+      },
+      labels: {
+        name: "Name", // DRAFT(ai)
+        email: "Email", // DRAFT(ai)
+        countryCode: "Country", // DRAFT(ai)
+        city: "City", // DRAFT(ai)
+        instagram: "Instagram (optional)", // DRAFT(ai)
+        referralCode: "Referral code", // DRAFT(ai)
+        heardAbout: "How did you hear about us?", // DRAFT(ai)
+        consent:
+          "I agree to join the supporter list and receive signup emails from Sujood Gang.", // DRAFT(ai)
+      },
+      helpers: {
+        name: "Use the name you want attached to your supporter record.", // DRAFT(ai)
+        email: "We will send a verification link here.", // DRAFT(ai)
+        countryCode: "Used to understand where support is forming.", // DRAFT(ai)
+        city: "Used for city-level community planning.", // DRAFT(ai)
+        instagram: "Add this only if you want your social identity connected.", // DRAFT(ai)
+        referralCode: "Use one if another supporter invited you.", // DRAFT(ai)
+        heardAbout: "This helps measure which channels are working.", // DRAFT(ai)
+        consent:
+          "Signup emails include verification and occasional project updates.", // DRAFT(ai)
+      },
+      placeholders: {
+        name: "Your name", // DRAFT(ai)
+        email: "you@example.com", // DRAFT(ai)
+        countryCode: "Select country", // DRAFT(ai)
+        city: "Your city", // DRAFT(ai)
+        instagram: "@handle", // DRAFT(ai)
+        referralCode: "Referral code", // DRAFT(ai)
+        heardAbout: "Friend, Instagram, search, or other", // DRAFT(ai)
+      },
+      honeypotLabel: "Website", // DRAFT(ai)
+      countryDefaultOption: "Select country", // DRAFT(ai)
+      submitLabel: "Join as a supporter", // DRAFT(ai)
+      pendingLabel: "Joining", // DRAFT(ai)
+      statusLabels: {
+        created:
+          "Check your inbox to verify your email and complete your signup.", // DRAFT(ai)
+        pending:
+          "You are already on the list pending email verification. Check your inbox for the confirmation link.", // DRAFT(ai)
+        alreadyVerified: "You are already verified as a supporter.", // DRAFT(ai)
+        accepted: "Thank you. If this signup is valid, we will process it.", // DRAFT(ai)
+        rateLimited: "Too many attempts. Please try again later.", // DRAFT(ai)
+        validationError: "Review the form fields and try again.", // DRAFT(ai)
+        emailSendFailed:
+          "We could not send the confirmation email. Please try again shortly.", // DRAFT(ai)
+        unexpectedError: "Something went wrong. Please try again.", // DRAFT(ai)
+      },
+    },
   },
   faq: [
     {
@@ -427,7 +585,7 @@ export const siteCopy = {
     },
     manageLink: {
       label: "Unsubscribe or manage updates", // DRAFT(ai)
-      href: "#join", // DRAFT(ai)
+      href: "/#join", // DRAFT(ai)
     },
   },
   legal: {
@@ -573,5 +731,6 @@ export type {
   FaqCopy,
   LinkCopy,
   MemberBenefitCopy,
+  SignupFormCopy,
   SiteCopy,
 };

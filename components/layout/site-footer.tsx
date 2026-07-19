@@ -60,19 +60,19 @@ export function SiteFooter({ copy }: SiteFooterProps) {
             className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm"
           >
             <Link
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground focus-visible:ring-ring/50 inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg focus-visible:ring-3 focus-visible:outline-none"
               href={copy.footer.privacyLink.href}
             >
               {copy.footer.privacyLink.label}
             </Link>
             <Link
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground focus-visible:ring-ring/50 inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg focus-visible:ring-3 focus-visible:outline-none"
               href={copy.footer.termsLink.href}
             >
               {copy.footer.termsLink.label}
             </Link>
             <Link
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground focus-visible:ring-ring/50 inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg focus-visible:ring-3 focus-visible:outline-none"
               href={copy.footer.manageLink.href}
             >
               {copy.footer.manageLink.label}

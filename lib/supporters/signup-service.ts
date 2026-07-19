@@ -29,6 +29,9 @@ export type SupporterRecord = {
   consent_version?: string;
   consent_at?: Date;
   verification_sent_at?: Date;
+  unsubscribed_at?: Date;
+  suppressed_at?: Date;
+  suppression_reason?: "hard_bounce" | "complained";
 };
 
 export type VerificationTokenRecord = {
@@ -37,6 +40,17 @@ export type VerificationTokenRecord = {
   token_hash: string;
   expires_at: Date;
   used_at: Date | null;
+};
+
+export type EmailEventRecord = {
+  id: string;
+  supporter_id: string | null;
+  type: "delivered" | "bounced" | "complained" | "failed";
+  provider_event_id?: string;
+  provider_message_id?: string;
+  email_normalized?: string;
+  provider_payload?: unknown;
+  created_at: Date;
 };
 
 export type AttributionInput = {
@@ -81,6 +95,25 @@ export type SupporterStore = {
     expires_at: Date;
     now: Date;
   }): Promise<void>;
+  markVerificationSent?(params: {
+    supporter_id: string;
+    verification_sent_at: Date;
+  }): Promise<void>;
+  countVerificationTokensSince?(params: {
+    supporter_id: string;
+    since: Date;
+  }): Promise<number>;
+  unsubscribeSupporter?(params: {
+    supporter_id: string;
+    unsubscribed_at: Date;
+  }): Promise<void>;
+  suppressSupporter?(params: {
+    supporter_id: string;
+    suppressed_at: Date;
+    suppression_reason: "hard_bounce" | "complained";
+  }): Promise<void>;
+  isSuppressed?(supporterId: string): Promise<boolean>;
+  recordEmailEvent?(row: Omit<EmailEventRecord, "id">): Promise<void>;
   findVerificationTokenByHash?(
     tokenHash: string,
   ): Promise<VerificationTokenRecord | null>;
@@ -97,6 +130,7 @@ export type CreateSupporterResult =
   | { state: "accepted" }
   | { state: "already_verified" }
   | { state: "created" }
+  | { state: "email_send_failed" }
   | { state: "pending" }
   | { state: "rate_limited"; retryAfterSeconds?: number }
   | { state: "validation_error" };
@@ -197,7 +231,7 @@ export function createSupporterSignupService({
         consent_at: timestamp,
         verification_sent_at: timestamp,
       });
-      await issueAndSendVerification({
+      const sent = await issueAndSendVerification({
         store,
         sendConfirmationEmail,
         randomBytes,
@@ -205,6 +239,7 @@ export function createSupporterSignupService({
         timestamp,
         tokenTtlHours,
       });
+      if (!sent) return { state: "email_send_failed" };
 
       return { state: "created" };
     },
@@ -277,11 +312,20 @@ async function issueAndSendVerification({
     expires_at: addHours(timestamp, tokenTtlHours),
     now: timestamp,
   });
-  await sendConfirmationEmail({
-    to: supporter.email_normalized,
-    token,
-    supporterId: supporter.id,
-  });
+  try {
+    await sendConfirmationEmail({
+      to: supporter.email_normalized,
+      token,
+      supporterId: supporter.id,
+    });
+    await store.markVerificationSent?.({
+      supporter_id: supporter.id,
+      verification_sent_at: timestamp,
+    });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function normalizeAttribution(attribution?: AttributionInput) {

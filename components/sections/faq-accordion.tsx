@@ -2,6 +2,7 @@
 
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
+import { trackFunnelEvent } from "@/lib/analytics/client";
 import type { FaqCopy } from "@/lib/content/copy";
 import { cn } from "@/lib/utils";
 
@@ -17,11 +18,7 @@ export function FaqAccordion({ faqs }: FaqAccordionProps) {
       const nextId = currentId === id ? null : id;
 
       if (nextId) {
-        window.dispatchEvent(
-          new CustomEvent("faq_opened", {
-            detail: { id: nextId },
-          }),
-        );
+        trackFunnelEvent("faq_opened", { id: nextId });
       }
 
       return nextId;

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import { TrackedLink } from "@/components/analytics/tracked-link";
 import { Button } from "@/components/ui/button";
 import type { SiteCopy } from "@/lib/content/copy";
 import { cn } from "@/lib/utils";
@@ -61,6 +62,7 @@ export function SiteHeader({ copy }: SiteHeaderProps) {
               nativeButton={false}
               variant="ghost"
               render={<Link href={link.href} />}
+              className="min-h-11 px-3"
             >
               {link.label}
             </Button>
@@ -70,7 +72,14 @@ export function SiteHeader({ copy }: SiteHeaderProps) {
         <div className="hidden items-center md:flex">
           <Button
             nativeButton={false}
-            render={<Link href={copy.hero.primaryCta.href} />}
+            render={
+              <TrackedLink
+                href={copy.hero.primaryCta.href}
+                eventName="primary_cta_clicked"
+                eventProperties={{ placement: "header" }}
+              />
+            }
+            className="min-h-11 px-4"
           >
             {copy.hero.primaryCta.label}
           </Button>
@@ -113,7 +122,12 @@ export function SiteHeader({ copy }: SiteHeaderProps) {
             <Button
               nativeButton={false}
               render={
-                <Link href={copy.hero.primaryCta.href} onClick={closeMenu} />
+                <TrackedLink
+                  href={copy.hero.primaryCta.href}
+                  eventName="primary_cta_clicked"
+                  eventProperties={{ placement: "mobile_menu" }}
+                  onClick={closeMenu}
+                />
               }
               className="mt-2 min-h-11"
             >

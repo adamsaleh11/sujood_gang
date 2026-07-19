@@ -30,8 +30,8 @@ green primary) but the site ships light-first.
 
 ## Typography
 
-- Sans: **Geist** via `next/font` (`--font-sans`) — DRAFT(ai) placeholder; brand
-  font is a one-line swap in `app/layout.tsx`.
+- Sans: **DM Sans** via `next/font` (`--font-sans`) — chosen for a warmer,
+  premium community-brand tone while preserving clear UI readability.
 - Mono: Geist Mono (`--font-geist-mono`).
 - Display sizes (fluid, for heroes): `text-display` (~44→80px, -3% tracking),
   `text-display-sm` (~32→52px). Standard Tailwind scale for everything else.
