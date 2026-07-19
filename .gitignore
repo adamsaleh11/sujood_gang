@@ -134,3 +134,9 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Next.js additions
+.vercel
+next-env.d.ts
+.DS_Store
+*.pem
